@@ -15,7 +15,7 @@ const formatter = new Intl.NumberFormat("id-ID", {
 
 export const ListItem = ({ data, callback, isPengeluaran }) => {
   return (
-    <ul>
+    <ul className="text-sm">
       {data.map((item) => (
         <li
           key={item._id}
