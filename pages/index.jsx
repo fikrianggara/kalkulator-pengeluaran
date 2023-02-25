@@ -1,7 +1,8 @@
 import { data as dummyData } from "@/data";
 import { useEffect, useState } from "react";
-// import { IconCheck } from "@tabler/icons";
+import { IconCircleCheckFilled, IconCopy } from "@tabler/icons-react";
 import { Home as HomeCard } from "@/components/Card";
+
 const TITLE = "Kalkulator Pengeluaran";
 
 const formatter = new Intl.NumberFormat("id-ID", {
@@ -19,13 +20,20 @@ export const ListItem = ({ data, callback, isPengeluaran }) => {
       {data.map((item) => (
         <li
           key={item._id}
-          className={`hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg ${
+          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg ${
             item.is_checked && !isPengeluaran ? "text-green-500" : ""
           }`}
           onClick={(e) => callback(item._id)}
           disabled={item.is_checked}
         >
-          {item.nama} - Rp. {formatter.format(item.biaya)}
+          <span>
+            {item.nama} - Rp. {formatter.format(item.biaya)}
+          </span>
+          {item.is_checked && !isPengeluaran ? (
+            <IconCircleCheckFilled color="gray" size={24} stroke={2} />
+          ) : (
+            ""
+          )}
         </li>
       ))}
     </ul>
@@ -56,6 +64,7 @@ export default function Home() {
   const [selectedData, setSelectedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   let pengeluaranComp;
 
@@ -133,10 +142,29 @@ export default function Home() {
         title={
           <div className="flex justify-between">
             <span>Pengeluaran</span>
-            <span>
+            <div className="flex space-x-2 relative">
               Total :{" "}
-              <span className="text-blue-500">{formatter.format(total)}</span>
-            </span>
+              <div
+                className="flex space-x-2 items-center w-fit text-blue-500 hover:cursor-pointer hover:underline"
+                onClick={() => {
+                  navigator.clipboard.writeText(total);
+                  setShowTooltip(true);
+                  setTimeout(() => setShowTooltip(false), 2500);
+                }}
+              >
+                <span>{formatter.format(total)}</span>
+
+                <IconCopy size={20} />
+              </div>
+              <span
+                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black"
+                style={{
+                  display: showTooltip ? "block" : "none",
+                }}
+              >
+                Nilai disalin !
+              </span>
+            </div>
           </div>
         }
       >
