@@ -135,9 +135,7 @@ export default function Home() {
             <span>Pengeluaran</span>
             <span>
               Total :{" "}
-              <span className="text-blue-500">
-                Rp. {formatter.format(total)}
-              </span>
+              <span className="text-blue-500">{formatter.format(total)}</span>
             </span>
           </div>
         }
