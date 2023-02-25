@@ -27,7 +27,7 @@ export const ListItem = ({ data, callback, isPengeluaran }) => {
           disabled={item.is_checked}
         >
           <span>
-            {item.nama} - Rp. {formatter.format(item.biaya)}
+            {item.nama} - {formatter.format(item.biaya)}
           </span>
           {item.is_checked && !isPengeluaran ? (
             <IconCircleCheckFilled color="gray" size={24} stroke={2} />
