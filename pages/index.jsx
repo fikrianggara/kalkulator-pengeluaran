@@ -14,26 +14,43 @@ const formatter = new Intl.NumberFormat("id-ID", {
   //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
 
-export const ListItem = ({ data, callback, isPengeluaran }) => {
+export const ListItem = ({ data, callback }) => {
   return (
     <ul className="text-sm">
       {data.map((item) => (
         <li
           key={item._id}
           className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg ${
-            item.is_checked && !isPengeluaran ? "text-green-500" : ""
+            item.is_checked ? "text-green-500" : ""
           }`}
+          onClick={(e) => callback(item._id)}
+          disabled={item.is_checked}
+        >
+          <span>{item.nama}</span>
+          {item.is_checked ? (
+            <IconCircleCheckFilled color="gray" size={24} stroke={2} />
+          ) : (
+            ""
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export const ListSelectedItem = ({ data, callback }) => {
+  return (
+    <ul className="text-sm">
+      {data.map((item) => (
+        <li
+          key={item._id}
+          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg `}
           onClick={(e) => callback(item._id)}
           disabled={item.is_checked}
         >
           <span>
             {item.nama} - {formatter.format(item.biaya)}
           </span>
-          {item.is_checked && !isPengeluaran ? (
-            <IconCircleCheckFilled color="gray" size={24} stroke={2} />
-          ) : (
-            ""
-          )}
         </li>
       ))}
     </ul>
@@ -59,6 +76,7 @@ export const SearchForm = ({ callback }) => {
     </div>
   );
 };
+
 export default function Home() {
   const [total, setTotal] = useState(0);
   const [selectedData, setSelectedData] = useState([]);
@@ -157,7 +175,7 @@ export default function Home() {
                 <IconCopy size={20} />
               </div>
               <span
-                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black"
+                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black shadow-md"
                 style={{
                   display: showTooltip ? "block" : "none",
                 }}
@@ -169,7 +187,7 @@ export default function Home() {
         }
       >
         {selectedData.length > 0 ? (
-          <ListItem
+          <ListSelectedItem
             data={selectedData}
             callback={() => console.log("clicked")}
             isPengeluaran={true}
