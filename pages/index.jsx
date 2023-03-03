@@ -1,17 +1,19 @@
 import { data as dummyData } from "@/data";
 import { useEffect, useState } from "react";
-import { IconCircleCheckFilled, IconCopy } from "@tabler/icons-react";
+import {
+  IconCircleCheckFilled,
+  IconCopy,
+  IconCirclePlus,
+  IconPencil,
+  IconX,
+} from "@tabler/icons-react";
 import { Home as HomeCard } from "@/components/Card";
-
+import { Modal as FormModal } from "@/components/Modal";
 const TITLE = "Kalkulator Pengeluaran";
 
 const formatter = new Intl.NumberFormat("id-ID", {
   style: "currency",
   currency: "IDR",
-
-  // These options are needed to round to whole numbers if that's what you want.
-  //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
-  //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
 });
 
 export const ListItem = ({ data, callback }) => {
@@ -20,18 +22,18 @@ export const ListItem = ({ data, callback }) => {
       {data.map((item) => (
         <li
           key={item._id}
-          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg ${
+          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out ${
             item.is_checked ? "text-green-500" : ""
           }`}
           onClick={(e) => callback(item._id)}
           disabled={item.is_checked}
         >
-          <span>{item.nama}</span>
           {item.is_checked ? (
             <IconCircleCheckFilled color="gray" size={24} stroke={2} />
           ) : (
-            ""
+            <IconCirclePlus size={24} stroke={2} color="gray" />
           )}
+          <span>{item.nama}</span>
         </li>
       ))}
     </ul>
@@ -40,17 +42,25 @@ export const ListItem = ({ data, callback }) => {
 
 export const ListSelectedItem = ({ data, callback }) => {
   return (
-    <ul className="text-sm">
+    <ul className="text-sm space-y-2">
       {data.map((item) => (
-        <li
-          key={item._id}
-          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 rounded-lg `}
-          onClick={(e) => callback(item._id)}
-          disabled={item.is_checked}
-        >
-          <span>
-            {item.nama} - {formatter.format(item.biaya)}
-          </span>
+        <li key={item._id} className={`flex space-x-2 `}>
+          <div className="flex w-full justify-between items-center">
+            <div className="flex space-x-4 items-center">
+              <span>{item.amount}</span>
+              <IconX size={16} />
+              <span>{item.nama}</span>
+              <span>-</span>
+              <span> {formatter.format(item.biaya)}</span>
+              {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
+            </div>
+            <div
+              className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+              onClick={(e) => callback(item)}
+            >
+              <IconPencil size={20} />
+            </div>
+          </div>
         </li>
       ))}
     </ul>
@@ -83,14 +93,19 @@ export default function Home() {
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [showTooltip, setShowTooltip] = useState(false);
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [item, setItem] = useState(null);
   let pengeluaranComp;
-
+  let modalComp;
   useEffect(() => {
     setData(dummyData);
     setFilteredData(dummyData);
   }, []);
-
+  useEffect(() => {
+    if (isOpen) {
+      modalComp = <FormModal callback={onModalClickHandler} item={item} />;
+    }
+  }, [isOpen]);
   const getTotal = (total, item) => {
     return total + item.biaya;
   };
@@ -103,12 +118,11 @@ export default function Home() {
       return item;
     });
     setData(tempData);
-    console.log("tempData", tempData);
     const tempSelectedData = tempData.filter((item) => item.is_checked);
-
     setSelectedData(tempSelectedData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
   };
+
   if (!data) {
     return (
       <div>
@@ -119,11 +133,7 @@ export default function Home() {
     pengeluaranComp = (
       <>
         {filteredData.length > 0 ? (
-          <ListItem
-            data={filteredData}
-            callback={pengeluaranClickHandler}
-            isPengeluaran={false}
-          />
+          <ListItem data={filteredData} callback={pengeluaranClickHandler} />
         ) : (
           <div className="m-auto text-center text-gray-400">Tidak ada data</div>
         )}
@@ -140,9 +150,15 @@ export default function Home() {
       setFilteredData(tempData);
     }
   };
+  const onModalClickHandler = (item) => {
+    setItem(item);
+    setIsOpen((prev) => !prev);
+  };
   // console.log("filteredData", filteredData);
   return (
-    <main className="bg-gray-50 min-h-screen space-y-4">
+    <main className="bg-gray-50 min-h-screen space-y-4 relative">
+      {/* {isOpen ? <FormModal callback={onModalClickHandler} /> : ""} */}
+      {modalComp}
       <nav className="p-4 bg-gray-100 shadow">
         <div>
           <h1 className="text-gray-700 text-xl text-center font-medium">
@@ -189,8 +205,7 @@ export default function Home() {
         {selectedData.length > 0 ? (
           <ListSelectedItem
             data={selectedData}
-            callback={() => console.log("clicked")}
-            isPengeluaran={true}
+            callback={onModalClickHandler}
           />
         ) : (
           <div className="m-auto text-center text-gray-400">
