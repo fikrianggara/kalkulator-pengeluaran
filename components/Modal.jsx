@@ -4,13 +4,14 @@ export const Modal = ({ item, callback }) => {
   console.log(item);
   return (
     <div
-      className="w-screen h-screen bg-black opacity-25 absolute z-10"
+      className="fixed inset-0 bg-black bg-opacity-10 transition-opacity z-10"
       onClick={(e) => {
-        console.log("kepencet");
         callback();
       }}
     >
-      {item}
+      <div className="text-xl tex-black inset-0 m-auto sm:w-11/12 w-8/10 h-fit bg-white z-20">
+        {item.nama}
+      </div>
     </div>
   );
 };

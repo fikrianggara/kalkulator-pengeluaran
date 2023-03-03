@@ -40,7 +40,11 @@ export const ListItem = ({ data, callback }) => {
   );
 };
 
-export const ListSelectedItem = ({ data, callback }) => {
+export const ListSelectedItem = ({ data }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const onModalClickHandler = () => {
+    setIsOpen((prev) => !prev);
+  };
   return (
     <ul className="text-sm space-y-2">
       {data.map((item) => (
@@ -56,10 +60,17 @@ export const ListSelectedItem = ({ data, callback }) => {
             </div>
             <div
               className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
-              onClick={(e) => callback(item)}
+              onClick={(e) => {
+                setIsOpen((prev) => !prev);
+              }}
             >
               <IconPencil size={20} />
             </div>
+            {isOpen ? (
+              <FormModal callback={onModalClickHandler} item={item} />
+            ) : (
+              ""
+            )}
           </div>
         </li>
       ))}
@@ -93,19 +104,14 @@ export default function Home() {
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [item, setItem] = useState(null);
+
   let pengeluaranComp;
-  let modalComp;
+
   useEffect(() => {
     setData(dummyData);
     setFilteredData(dummyData);
   }, []);
-  useEffect(() => {
-    if (isOpen) {
-      modalComp = <FormModal callback={onModalClickHandler} item={item} />;
-    }
-  }, [isOpen]);
+
   const getTotal = (total, item) => {
     return total + item.biaya;
   };
@@ -150,15 +156,10 @@ export default function Home() {
       setFilteredData(tempData);
     }
   };
-  const onModalClickHandler = (item) => {
-    setItem(item);
-    setIsOpen((prev) => !prev);
-  };
+
   // console.log("filteredData", filteredData);
   return (
     <main className="bg-gray-50 min-h-screen space-y-4 relative">
-      {/* {isOpen ? <FormModal callback={onModalClickHandler} /> : ""} */}
-      {modalComp}
       <nav className="p-4 bg-gray-100 shadow">
         <div>
           <h1 className="text-gray-700 text-xl text-center font-medium">
@@ -176,8 +177,8 @@ export default function Home() {
         title={
           <div className="flex justify-between">
             <span>Pengeluaran</span>
-            <div className="flex space-x-2 relative">
-              Total :{" "}
+            <div className="flex space-x-4 relative">
+              Total-
               <div
                 className="flex space-x-2 items-center w-fit text-blue-500 hover:cursor-pointer hover:underline"
                 onClick={() => {
@@ -191,7 +192,7 @@ export default function Home() {
                 <IconCopy size={20} />
               </div>
               <span
-                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black shadow-md"
+                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black shadow-md z-20"
                 style={{
                   display: showTooltip ? "block" : "none",
                 }}
@@ -203,10 +204,7 @@ export default function Home() {
         }
       >
         {selectedData.length > 0 ? (
-          <ListSelectedItem
-            data={selectedData}
-            callback={onModalClickHandler}
-          />
+          <ListSelectedItem data={selectedData} />
         ) : (
           <div className="m-auto text-center text-gray-400">
             Belum ada Pengeluaran
