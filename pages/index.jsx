@@ -1,4 +1,4 @@
-import { data as dummyData } from "@/data";
+import { data as dummyData, updateDataById } from "@/data";
 import { useEffect, useState } from "react";
 import {
   IconCircleCheckFilled,
@@ -7,7 +7,7 @@ import {
   IconPencil,
   IconX,
 } from "@tabler/icons-react";
-import { Home as HomeCard } from "@/components/Card";
+import { Home as HomeCard, Modal as ModalCard } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
 const TITLE = "Kalkulator Pengeluaran";
 
@@ -17,12 +17,13 @@ const formatter = new Intl.NumberFormat("id-ID", {
 });
 
 export const ListItem = ({ data, callback }) => {
+  console.log(data);
   return (
-    <ul className="text-sm">
+    <ul className="text-sm space-y-2">
       {data.map((item) => (
         <li
           key={item._id}
-          className={`flex space-x-2 hover:bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out ${
+          className={`flex space-x-2 bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out ${
             item.is_checked ? "text-green-500" : ""
           }`}
           onClick={(e) => callback(item._id)}
@@ -40,41 +41,53 @@ export const ListItem = ({ data, callback }) => {
   );
 };
 
-export const ListSelectedItem = ({ data }) => {
+export const ListSelectedItem = ({ data, updateDataCallback }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [modalItem, setModalItem] = useState(null);
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
   return (
-    <ul className="text-sm space-y-2">
-      {data.map((item) => (
-        <li key={item._id} className={`flex space-x-2 `}>
-          <div className="flex w-full justify-between items-center">
-            <div className="flex space-x-4 items-center">
-              <span>{item.amount}</span>
-              <IconX size={16} />
-              <span>{item.nama}</span>
-              <span>-</span>
-              <span> {formatter.format(item.biaya)}</span>
-              {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
+    <>
+      {isOpen && (
+        <FormModal callback={onModalClickHandler}>
+          <ModalCard
+            item={modalItem}
+            callback={onModalClickHandler}
+            updateDataCallback={updateDataCallback}
+          />
+        </FormModal>
+      )}
+      <ul className="text-sm space-y-2">
+        {data.map((item) => (
+          <li
+            key={item._id}
+            className={`flex space-x-2 bg-gray-50 p-2 rounded-lg shadow`}
+          >
+            <div className="flex w-full items-center space-x-4">
+              <div
+                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+                onClick={(e) => {
+                  setIsOpen((prev) => !prev);
+                  setModalItem(item);
+                }}
+              >
+                <IconPencil size={20} />
+              </div>
+              <div className="flex md:space-x-4 items-center ">
+                <span>{item.amount}</span>
+                <IconX size={16} />
+                <span>{item.nama}</span>
+                <span> ({formatter.format(item.biaya)})</span>
+                <span>=</span>
+                <span>{formatter.format(item.biaya * item.amount)}</span>
+                {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
+              </div>
             </div>
-            <div
-              className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
-              onClick={(e) => {
-                setIsOpen((prev) => !prev);
-              }}
-            >
-              <IconPencil size={20} />
-            </div>
-            {isOpen ? (
-              <FormModal callback={onModalClickHandler} item={item} />
-            ) : (
-              ""
-            )}
-          </div>
-        </li>
-      ))}
-    </ul>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 };
 
@@ -113,13 +126,15 @@ export default function Home() {
   }, []);
 
   const getTotal = (total, item) => {
-    return total + item.biaya;
+    return total + item.biaya * item.amount;
   };
 
   const pengeluaranClickHandler = (id) => {
     const tempData = data.map((item) => {
       if (item._id == id) {
+        console.log(item);
         item.is_checked = !item.is_checked;
+        console.log(item);
       }
       return item;
     });
@@ -127,6 +142,15 @@ export default function Home() {
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
+  };
+
+  const updateDataHandler = (item) => {
+    const tempData = updateDataById(item, data);
+    const tempSelectedData = tempData.filter((item) => item.is_checked);
+    setSelectedData(tempSelectedData);
+    setData(tempData);
+    setTotal(tempSelectedData.reduce(getTotal, 0));
+    setFilteredData(tempData);
   };
 
   if (!data) {
@@ -204,7 +228,10 @@ export default function Home() {
         }
       >
         {selectedData.length > 0 ? (
-          <ListSelectedItem data={selectedData} />
+          <ListSelectedItem
+            data={selectedData}
+            updateDataCallback={updateDataHandler}
+          />
         ) : (
           <div className="m-auto text-center text-gray-400">
             Belum ada Pengeluaran
