@@ -1,4 +1,4 @@
-import { addData, data as dummyData, updateDataById } from "@/data";
+import { addData, data as dummyData, updateDataById, deleteData } from "@/data";
 import { useEffect, useState } from "react";
 import {
   IconCircleCheckFilled,
@@ -6,6 +6,7 @@ import {
   IconCirclePlus,
   IconPencil,
   IconX,
+  IconTrash,
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
@@ -20,25 +21,46 @@ const formatter = new Intl.NumberFormat("id-ID", {
   currency: "IDR",
 });
 
-export const ListItem = ({ data, callback }) => {
-  console.log(data);
+export const ListItem = ({ data, callback, deleteDataCallback }) => {
   return (
     <ul className="text-sm space-y-2 h-[200px] overflow-y-auto scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
       {data.map((item) => (
         <li
           key={item._id}
-          className={`flex space-x-2 bg-gray-50 hover:text-blue-500 hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out ${
-            item.is_checked ? "text-green-500" : ""
-          }`}
-          onClick={(e) => callback(item._id)}
-          disabled={item.is_checked}
+          className="flex justify-between space-x-2 bg-gray-50 p-2 rounded-lg pr-4 items-center"
         >
-          {item.is_checked ? (
-            <IconCircleCheckFilled color="gray" size={24} stroke={2} />
-          ) : (
-            <IconCirclePlus size={24} stroke={2} color="gray" />
+          <div
+            className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out ${
+              item.is_checked ? "text-green-500" : ""
+            }`}
+            onClick={(e) => callback(item._id)}
+            disabled={item.is_checked}
+          >
+            {item.is_checked ? (
+              <IconCircleCheckFilled color="gray" size={24} stroke={2} />
+            ) : (
+              <IconCirclePlus size={24} stroke={2} color="gray" />
+            )}
+            <span
+              className={`font-medium ${
+                item.is_checked ? "text-green-500 hover:text-blue-500" : ""
+              }`}
+            >
+              {item.kategori}
+            </span>
+            <span>-</span>
+            <span>{item.nama}</span>
+          </div>
+          {item.is_deleteable && (
+            <div
+              className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+              onClick={() => {
+                deleteDataCallback(item._id);
+              }}
+            >
+              <IconTrash size={20} />
+            </div>
           )}
-          <span>{item.nama}</span>
         </li>
       ))}
     </ul>
@@ -120,7 +142,7 @@ export const SearchForm = ({ callback }) => {
     <div className="border-[0.5px] rounded-lg bg-gray-100 w-full md:w-11/12 lg:w-8/12 m-auto">
       <input
         type="text"
-        placeholder="cari pengeluaran"
+        placeholder="cari kategori pengeluaran"
         className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         value={searchInput}
@@ -141,8 +163,20 @@ export default function Home() {
   let pengeluaranComp;
 
   useEffect(() => {
-    setData(dummyData);
-    setFilteredData(dummyData);
+    let tempData;
+    if (typeof Storage !== "undefined") {
+      if (localStorage.getItem("data") === null) {
+        localStorage.setItem("data", JSON.stringify(dummyData));
+      }
+      tempData = JSON.parse(localStorage.getItem("data"));
+      setData(tempData);
+      setFilteredData(tempData);
+      setSelectedData(tempData.filter((item) => item.is_checked));
+    } else {
+      setData(dummyData);
+      setFilteredData(dummyData);
+      setSelectedData(dummyData.filter((item) => item.is_checked));
+    }
   }, []);
 
   const getTotal = (total, item) => {
@@ -152,16 +186,20 @@ export default function Home() {
   const pengeluaranClickHandler = (id) => {
     const tempData = data.map((item) => {
       if (item._id == id) {
-        console.log(item);
         item.is_checked = !item.is_checked;
-        console.log(item);
       }
       return item;
     });
+    // let updatedData = data.filter((item) => item._id == id)[0];
+    // updatedData.is_checked = !updatedData.is_checked;
+    // updatedData.amount = 1;
+    // let tempData = updateDataById(updatedData, data);
+    // console.log(tempData);
     setData(tempData);
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
+    // setFilteredData(tempData);
   };
 
   const updateDataHandler = (item) => {
@@ -181,7 +219,14 @@ export default function Home() {
     setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
   };
-
+  const deleteDataHandler = (id) => {
+    const tempData = deleteData(id, data);
+    const tempSelectedData = tempData.filter((item) => item.is_checked);
+    setSelectedData(tempSelectedData);
+    setData(tempData);
+    setTotal(tempSelectedData.reduce(getTotal, 0));
+    setFilteredData(tempData);
+  };
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
@@ -196,7 +241,11 @@ export default function Home() {
     pengeluaranComp = (
       <>
         {filteredData.length > 0 ? (
-          <ListItem data={filteredData} callback={pengeluaranClickHandler} />
+          <ListItem
+            data={filteredData}
+            callback={pengeluaranClickHandler}
+            deleteDataCallback={deleteDataHandler}
+          />
         ) : (
           <div className="m-auto text-center text-gray-400">Tidak ada data</div>
         )}
@@ -208,12 +257,15 @@ export default function Home() {
     if (filterInput.length < 1) {
       setFilteredData(data);
     } else {
-      const tempData = data.filter((item) => item.nama.includes(filterInput));
+      const tempData = data.filter((item) => {
+        const temp =
+          "" + item.kategori.toLowerCase() + "-" + item.nama.toLowerCase();
+        return temp.includes(filterInput);
+      });
       setFilteredData(tempData);
     }
   };
 
-  // console.log("filteredData", filteredData);
   return (
     <main className="bg-gray-50 min-h-screen space-y-4 relative">
       <nav className="p-4 bg-gray-100 shadow">
@@ -232,6 +284,7 @@ export default function Home() {
                   item={data[0]}
                   callback={onModalClickHandler}
                   addDataCallback={addDataHandler}
+                  listKategori={[...new Set(data.map((item) => item.kategori))]}
                 />
               </FormModal>
             </div>
@@ -290,6 +343,16 @@ export default function Home() {
           </div>
         )}
       </HomeCard>
+      {/* <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-base text-gray-600 absolute bottom-0">
+        Made by{" "}
+        <a href="https://github.com/fikrianggara" className="text-blue-500">
+          Fikri Septrian Anggara
+        </a>
+        , in collaboration with{" "}
+        <a href="https://tanjabtimkab.bps.go.id/" className="text-blue-500">
+          BPS Tanjung Jabung Timur
+        </a>
+      </footer> */}
     </main>
   );
 }

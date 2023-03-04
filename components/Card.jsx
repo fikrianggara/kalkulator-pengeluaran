@@ -77,32 +77,38 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
   );
 };
 
-export const ModalCreate = ({ callback, addDataCallback }) => {
+export const ModalCreate = ({ callback, addDataCallback, listKategori }) => {
   const [kategori, setKategori] = useState("");
   const [biaya, setBiaya] = useState("");
   const [nama, setNama] = useState("");
 
+  const isInputValid = (biaya) => {
+    const alphabets = /[a-zA-Z]/g;
+    return !alphabets.test(biaya);
+  };
+
   const onAddClickHandler = () => {
-    addDataCallback(kategori, nama, parseInt(biaya));
-    callback();
+    if (isInputValid(biaya)) {
+      addDataCallback(kategori, nama, parseInt(biaya));
+      callback();
+    } else {
+      setBiaya("");
+    }
   };
 
   return (
     <div className="absolute text-xl text-black inset-0 m-auto items-center w-fit h-fit bg-white z-20 rounded-xl p-4 space-y-4 pb-8 shadow-lg">
-      <h1 className="text-xl text-center font-medium text-gray-600">
+      <h1 className="text-lg text-center font-medium text-gray-600">
         Tambah Kategori Pengeluaran
       </h1>
       <hr />
       <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-base">
         <ul className="flex flex-col items-center space-y-4">
-          <li key="amount" className="flex space-x-4 w-full justify-between">
-            <span className="font-medium text-gray-600 flex-1">kategori</span>
-            <input
-              type="text"
-              value={kategori}
-              onChange={(e) => setKategori(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
-      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
+          <li key="amount">
+            <AutoCompleteInput
+              data={listKategori}
+              title="kategori"
+              callback={setKategori}
             />
           </li>
           <li key="nama" className="flex space-x-4 w-full justify-between">
@@ -141,6 +147,72 @@ export const ModalCreate = ({ callback, addDataCallback }) => {
             tambah
           </div>
         </div>
+      </div>
+    </div>
+  );
+};
+
+export const AutoCompleteInput = ({ data, callback, title }) => {
+  const [selectedData, setSelectedData] = useState("");
+  const [filteredData, setFilteredData] = useState(data);
+  const [isSelected, setIsSelected] = useState(false);
+
+  const onChangeHandler = (e) => {
+    setSelectedData(e.target.value);
+    const filterInput = e.target.value.toLowerCase();
+    if (filterInput.length < 1) {
+      setFilteredData(data);
+    } else {
+      const tempData = data.filter((item) =>
+        item.toLowerCase().includes(filterInput)
+      );
+      setFilteredData(tempData);
+    }
+    if (isSelected) {
+      setIsSelected(false);
+    }
+    callback(e.target.value);
+  };
+
+  return (
+    <div className="flex space-x-4 w-full justify-between">
+      <span className="font-medium text-gray-600 flex-1">{title}</span>
+      <div className="relative flex-1">
+        <input
+          type="text"
+          value={selectedData}
+          onChange={onChangeHandler}
+          className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+        />
+        {selectedData.length > 0 && !isSelected && (
+          <div className="absolute p-2 top-12 inset-x-0 max-h-56 rounded-lg bg-white shadow-lg z-10 overflow-y-scroll scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
+            <ul>
+              <li
+                onClick={() => {
+                  setIsSelected(true);
+                  callback(selectedData);
+                }}
+                className="p-2 hover:bg-gray-50 rounded-lg hover:cursor-pointer"
+              >
+                {selectedData}
+              </li>
+              {filteredData.map((item) => (
+                <li
+                  key={item}
+                  onClick={() => {
+                    setSelectedData(item);
+                    callback(item);
+                    setIsSelected(true);
+                  }}
+                  className="p-2 hover:bg-gray-50 rounded-lg hover:cursor-pointer"
+                >
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
