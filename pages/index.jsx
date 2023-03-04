@@ -362,7 +362,7 @@ export default function Home() {
       <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-sm md:text-base text-gray-600 absolute bottom-0 inset-x-0">
         Made by{" "}
         <a href="https://github.com/fikrianggara" className="text-blue-500">
-          Fikri Septrian Anggara
+          Fikri Septrian A.
         </a>
         , in collaboration with{" "}
         <a href="https://tanjabtimkab.bps.go.id/" className="text-blue-500">
