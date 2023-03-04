@@ -31,7 +31,7 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
         Perbarui Data
       </h1>
       <hr />
-      <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-lg md:text-regular">
+      <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-base">
         <ul className="flex flex-col items-center space-y-4">
           <li key="nama" className="flex space-x-4 w-full justify-between">
             <span className="font-medium text-gray-600 flex-1">nama</span>
@@ -60,13 +60,13 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
         </ul>
         <div className=" flex space-x-4 items-center w-full">
           <div
-            className="flex-1 p-2 text-center relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-red-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+            className="flex-1 p-2 text-center relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
             onClick={callback}
           >
             batal
           </div>
           <div
-            className="flex-1 text-center p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-green-400 to-green-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+            className="flex-1 text-center p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-green-400 to-blue-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
             onClick={onUpdateClickHandler}
           >
             perbarui
@@ -77,17 +77,13 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
   );
 };
 
-export const ModalCreate = ({ item, callback, addDataCallback }) => {
-  const [amount, setAmount] = useState("");
+export const ModalCreate = ({ callback, addDataCallback }) => {
+  const [kategori, setKategori] = useState("");
   const [biaya, setBiaya] = useState("");
   const [nama, setNama] = useState("");
-  const onUpdateClickHandler = () => {
-    const itemUpdate = {
-      ...item,
-      amount: parseInt(amount),
-      biaya: parseInt(biaya),
-    };
-    addDataCallback(itemUpdate);
+
+  const onAddClickHandler = () => {
+    addDataCallback(kategori, nama, parseInt(biaya));
     callback();
   };
 
@@ -97,8 +93,18 @@ export const ModalCreate = ({ item, callback, addDataCallback }) => {
         Tambah Kategori Pengeluaran
       </h1>
       <hr />
-      <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-lg">
+      <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-base">
         <ul className="flex flex-col items-center space-y-4">
+          <li key="amount" className="flex space-x-4 w-full justify-between">
+            <span className="font-medium text-gray-600 flex-1">kategori</span>
+            <input
+              type="text"
+              value={kategori}
+              onChange={(e) => setKategori(e.target.value)}
+              className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
+            />
+          </li>
           <li key="nama" className="flex space-x-4 w-full justify-between">
             <span className="font-medium text-gray-600 flex-1">nama</span>
             <input
@@ -109,16 +115,7 @@ export const ModalCreate = ({ item, callback, addDataCallback }) => {
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
             />
           </li>
-          <li key="amount" className="flex space-x-4 w-full justify-between">
-            <span className="font-medium text-gray-600 flex-1">jumlah</span>
-            <input
-              type="text"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
-      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
-            />
-          </li>
+
           <li key="biaya" className="flex space-x-4 w-full justify-between">
             <span className="font-medium text-gray-600 flex-1">biaya</span>
             <input
@@ -132,14 +129,14 @@ export const ModalCreate = ({ item, callback, addDataCallback }) => {
         </ul>
         <div className=" flex space-x-4 items-center w-full">
           <div
-            className="flex-1 p-2 text-center relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-red-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+            className="flex-1 p-2 text-center relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
             onClick={callback}
           >
             batal
           </div>
           <div
-            className="flex-1 text-center p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-green-400 to-green-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
-            onClick={onUpdateClickHandler}
+            className="flex-1 text-center p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-green-400 to-blue-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+            onClick={onAddClickHandler}
           >
             tambah
           </div>

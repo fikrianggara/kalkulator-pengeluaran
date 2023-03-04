@@ -1,4 +1,4 @@
-import { data as dummyData, updateDataById } from "@/data";
+import { addData, data as dummyData, updateDataById } from "@/data";
 import { useEffect, useState } from "react";
 import {
   IconCircleCheckFilled,
@@ -23,7 +23,7 @@ const formatter = new Intl.NumberFormat("id-ID", {
 export const ListItem = ({ data, callback }) => {
   console.log(data);
   return (
-    <ul className="text-sm space-y-2">
+    <ul className="text-sm space-y-2 h-[200px] overflow-y-auto scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
       {data.map((item) => (
         <li
           key={item._id}
@@ -74,16 +74,15 @@ export const ListSelectedItem = ({
           >
             <div className="flex w-full items-center space-x-4">
               <div
-                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-red-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
                 onClick={() => {
-                  console.log("deleted");
                   deleteDataCallback(item._id);
                 }}
               >
                 <IconX size={20} />
               </div>
               <div
-                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-sky-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
                 onClick={() => {
                   setIsOpen((prev) => !prev);
                   setModalItem(item);
@@ -174,6 +173,15 @@ export default function Home() {
     setFilteredData(tempData);
   };
 
+  const addDataHandler = (kategori, nama, biaya) => {
+    const tempData = addData(kategori, nama, biaya, data);
+    const tempSelectedData = tempData.filter((item) => item.is_checked);
+    setSelectedData(tempSelectedData);
+    setData(tempData);
+    setTotal(tempSelectedData.reduce(getTotal, 0));
+    setFilteredData(tempData);
+  };
+
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
@@ -223,7 +231,7 @@ export default function Home() {
                 <ModalCreateCard
                   item={data[0]}
                   callback={onModalClickHandler}
-                  addDataCallback={() => console.log("created")}
+                  addDataCallback={addDataHandler}
                 />
               </FormModal>
             </div>
