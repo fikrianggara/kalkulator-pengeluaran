@@ -41,7 +41,11 @@ export const ListItem = ({ data, callback }) => {
   );
 };
 
-export const ListSelectedItem = ({ data, updateDataCallback }) => {
+export const ListSelectedItem = ({
+  data,
+  updateDataCallback,
+  deleteDataCallback,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalItem, setModalItem] = useState(null);
   const onModalClickHandler = () => {
@@ -66,17 +70,29 @@ export const ListSelectedItem = ({ data, updateDataCallback }) => {
           >
             <div className="flex w-full items-center space-x-4">
               <div
+                className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-red-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
+                onClick={() => {
+                  console.log("deleted");
+                  deleteDataCallback(item._id);
+                }}
+              >
+                <IconX size={20} />
+              </div>
+              <div
                 className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-gray-400 to-gray-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
-                onClick={(e) => {
+                onClick={() => {
                   setIsOpen((prev) => !prev);
                   setModalItem(item);
                 }}
               >
                 <IconPencil size={20} />
               </div>
-              <div className="flex md:space-x-4 items-center ">
+
+              <div className="flex space-x-2 md:space-x-4 items-center overflow-x-auto text-xs md:text-regular p-2">
                 <span>{item.amount}</span>
-                <IconX size={16} />
+                <span>
+                  <IconX size={16} />
+                </span>
                 <span>{item.nama}</span>
                 <span> ({formatter.format(item.biaya)})</span>
                 <span>=</span>
@@ -101,7 +117,7 @@ export const SearchForm = ({ callback }) => {
     <div className="border-[0.5px] rounded-lg bg-gray-100 w-full md:w-11/12 lg:w-8/12 m-auto">
       <input
         type="text"
-        placeholder="bpjs"
+        placeholder="cari pengeluaran"
         className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         value={searchInput}
@@ -176,7 +192,6 @@ export default function Home() {
       setFilteredData(data);
     } else {
       const tempData = data.filter((item) => item.nama.includes(filterInput));
-      console.log(tempData);
       setFilteredData(tempData);
     }
   };
@@ -195,6 +210,18 @@ export default function Home() {
         <div className="space-y-2">
           <SearchForm callback={searchChangeHandler} />
           {pengeluaranComp}
+          <div
+            className={`flex space-x-2 hover:bg-gray-50  hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
+          >
+            <div className="flex m-auto">
+              <IconCirclePlus
+                size={30}
+                stroke={2}
+                color="gray"
+                className="hover:text-green-500"
+              />
+            </div>
+          </div>
         </div>
       </HomeCard>
       <HomeCard
@@ -231,6 +258,7 @@ export default function Home() {
           <ListSelectedItem
             data={selectedData}
             updateDataCallback={updateDataHandler}
+            deleteDataCallback={pengeluaranClickHandler}
           />
         ) : (
           <div className="m-auto text-center text-gray-400">
