@@ -126,8 +126,8 @@ export const ModalCreate = ({ callback, addDataCallback, listKategori }) => {
               type="text"
               value={nama}
               onChange={(e) => setNama(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
-      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
+              className="block  px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
             />
           </li>
 
@@ -137,8 +137,8 @@ export const ModalCreate = ({ callback, addDataCallback, listKategori }) => {
               type="text"
               value={biaya}
               onChange={(e) => setBiaya(e.target.value)}
-              className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
-      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
+              className="block px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
             />
           </li>
         </ul>
@@ -191,8 +191,8 @@ export const AutoCompleteInput = ({ data, callback, title }) => {
           type="text"
           value={selectedData}
           onChange={onChangeHandler}
-          className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
-      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+          className="block px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
         />
         {selectedData.length > 0 && !isSelected && (
           <div className="text-sm absolute p-2 top-12 inset-x-0 max-h-56 rounded-lg bg-white shadow-lg z-10 overflow-y-scroll scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
