@@ -274,7 +274,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-gray-50 min-h-screen space-y-4 relative">
+    <main className="bg-gray-50 min-h-screen space-y-4 relative pb-48">
       <nav className="p-4 bg-gray-100 shadow">
         <div>
           <h1 className="text-gray-700 text-xl text-center font-medium">
