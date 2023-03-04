@@ -171,11 +171,20 @@ export default function Home() {
       tempData = JSON.parse(localStorage.getItem("data"));
       setData(tempData);
       setFilteredData(tempData);
-      setSelectedData(tempData.filter((item) => item.is_checked));
+      const tempSelectedData = tempData.filter((item) => item.is_checked);
+      setSelectedData(tempSelectedData);
+      if (tempSelectedData.length > 0) {
+        setTotal(tempSelectedData.reduce(getTotal, 0));
+      }
     } else {
       setData(dummyData);
       setFilteredData(dummyData);
-      setSelectedData(dummyData.filter((item) => item.is_checked));
+      const tempSelectedData = dummyData.filter((item) => item.is_checked);
+      setSelectedData(tempSelectedData);
+      if (tempSelectedData.length > 0) {
+        setTotal(tempSelectedData.reduce(getTotal, 0));
+      }
+      // setTotal(getTotal(dummyData.filter((item) => item.is_checked)), 0);
     }
   }, []);
 
