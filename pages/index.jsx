@@ -7,7 +7,11 @@ import {
   IconPencil,
   IconX,
 } from "@tabler/icons-react";
-import { Home as HomeCard, Modal as ModalCard } from "@/components/Card";
+import {
+  Home as HomeCard,
+  Modal as ModalCard,
+  ModalCreate as ModalCreateCard,
+} from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
 const TITLE = "Kalkulator Pengeluaran";
 
@@ -133,6 +137,7 @@ export default function Home() {
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   let pengeluaranComp;
 
@@ -167,6 +172,10 @@ export default function Home() {
     setData(tempData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
+  };
+
+  const onModalClickHandler = () => {
+    setIsOpen((prev) => !prev);
   };
 
   if (!data) {
@@ -208,18 +217,25 @@ export default function Home() {
       </nav>
       <HomeCard title="Kategori Pengeluaran">
         <div className="space-y-2">
+          {isOpen && (
+            <div className="">
+              <FormModal callback={onModalClickHandler}>
+                <ModalCreateCard
+                  item={data[0]}
+                  callback={onModalClickHandler}
+                  addDataCallback={() => console.log("created")}
+                />
+              </FormModal>
+            </div>
+          )}
           <SearchForm callback={searchChangeHandler} />
           {pengeluaranComp}
           <div
             className={`flex space-x-2 hover:bg-gray-50  hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
+            onClick={onModalClickHandler}
           >
             <div className="flex m-auto">
-              <IconCirclePlus
-                size={30}
-                stroke={2}
-                color="gray"
-                className="hover:text-green-500"
-              />
+              <IconCirclePlus size={30} stroke={2} color="gray" />
             </div>
           </div>
         </div>
