@@ -15,14 +15,23 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
   const [amount, setAmount] = useState(item.amount);
   const [biaya, setBiaya] = useState(item.biaya);
 
+  const isInputValid = (biaya) => {
+    const alphabets = /[a-zA-Z]/g;
+    return !alphabets.test(biaya);
+  };
+
   const onUpdateClickHandler = () => {
-    const itemUpdate = {
-      ...item,
-      amount: parseInt(amount),
-      biaya: parseInt(biaya),
-    };
-    updateDataCallback(itemUpdate);
-    callback();
+    if (isInputValid) {
+      const itemUpdate = {
+        ...item,
+        amount: parseInt(amount),
+        biaya: parseInt(biaya),
+      };
+      updateDataCallback(itemUpdate);
+      callback();
+    } else {
+      setBiaya("");
+    }
   };
 
   return (
@@ -186,7 +195,7 @@ export const AutoCompleteInput = ({ data, callback, title }) => {
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         />
         {selectedData.length > 0 && !isSelected && (
-          <div className="absolute p-2 top-12 inset-x-0 max-h-56 rounded-lg bg-white shadow-lg z-10 overflow-y-scroll scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
+          <div className="text-sm absolute p-2 top-12 inset-x-0 max-h-56 rounded-lg bg-white shadow-lg z-10 overflow-y-scroll scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
             <ul>
               <li
                 onClick={() => {

@@ -192,13 +192,19 @@ export const data = [
 ];
 
 export const updateDataById = (updatedData, data) => {
+  let prevBiaya;
   const res = data.map((item) => {
     if (item._id === updatedData._id) {
-      item = { ...updatedData };
+      prevBiaya = item.biaya;
+      return { ...updatedData };
     }
     return item;
   });
-  if (typeof Storage !== "undefined") {
+  if (
+    typeof Storage !== "undefined" &&
+    (updatedData.is_deleteable ||
+      (!updatedData.is_deleteable && prevBiaya === updatedData.biaya))
+  ) {
     localStorage.setItem("data", JSON.stringify(res));
     return JSON.parse(localStorage.getItem("data"));
   } else {

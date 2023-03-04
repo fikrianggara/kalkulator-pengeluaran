@@ -118,7 +118,7 @@ export const ListSelectedItem = ({
                 <span>
                   <IconX size={16} />
                 </span>
-                <span>{item.nama}</span>
+                <div className="flex-1">{item.nama}</div>
                 <span> ({formatter.format(item.biaya)})</span>
                 <span>=</span>
                 <span>{formatter.format(item.biaya * item.amount)}</span>
@@ -350,7 +350,7 @@ export default function Home() {
           </div>
         )}
       </HomeCard>
-      {/* <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-base text-gray-600 absolute bottom-0">
+      <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-sm md:text-base text-gray-600 absolute bottom-0 inset-x-0">
         Made by{" "}
         <a href="https://github.com/fikrianggara" className="text-blue-500">
           Fikri Septrian Anggara
@@ -359,7 +359,7 @@ export default function Home() {
         <a href="https://tanjabtimkab.bps.go.id/" className="text-blue-500">
           BPS Tanjung Jabung Timur
         </a>
-      </footer> */}
+      </footer>
     </main>
   );
 }
