@@ -184,22 +184,29 @@ export default function Home() {
   };
 
   const pengeluaranClickHandler = (id) => {
-    const tempData = data.map((item) => {
-      if (item._id == id) {
-        item.is_checked = !item.is_checked;
-      }
-      return item;
-    });
-    // let updatedData = data.filter((item) => item._id == id)[0];
-    // updatedData.is_checked = !updatedData.is_checked;
-    // updatedData.amount = 1;
-    // let tempData = updateDataById(updatedData, data);
-    // console.log(tempData);
+    // const tempData = data.map((item) => {
+    //   if (item._id == id) {
+    //     item.is_checked = !item.is_checked;
+    //   }
+    //   return item;
+    // });
+    let updatedData = data.filter((item) => item._id == id)[0];
+    updatedData.is_checked = !updatedData.is_checked;
+    updatedData.amount = 1;
+    let tempData = updateDataById(updatedData, data);
+    console.log(tempData);
     setData(tempData);
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
-    // setFilteredData(tempData);
+    setFilteredData((prev) =>
+      prev.map((item) => {
+        if (item._id == updatedData._id) {
+          return updatedData;
+        }
+        return item;
+      })
+    );
   };
 
   const updateDataHandler = (item) => {
@@ -208,7 +215,7 @@ export default function Home() {
     setSelectedData(tempSelectedData);
     setData(tempData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
-    setFilteredData(tempData);
+    // setFilteredData(tempData);
   };
 
   const addDataHandler = (kategori, nama, biaya) => {
