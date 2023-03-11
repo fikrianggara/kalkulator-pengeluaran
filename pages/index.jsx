@@ -51,7 +51,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
             <span>-</span>
             <span>{item.nama}</span>
           </div>
-          {item.is_deleteable && (
+          {item.is_created_by_user && (
             <div
               className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
               onClick={() => {
@@ -152,6 +152,7 @@ export const SearchForm = ({ callback }) => {
   );
 };
 
+// kita butuh, is_filtered, is_checked
 export default function Home() {
   const [total, setTotal] = useState(0);
   const [selectedData, setSelectedData] = useState([]);
@@ -164,30 +165,43 @@ export default function Home() {
 
   useEffect(() => {
     let tempData;
-    if (typeof Storage !== "undefined") {
-      if (localStorage.getItem("data") === null) {
-        localStorage.setItem("data", JSON.stringify(dummyData));
+    // kalau mendukung localStorage dan ada data,
+    // ambil data itu, tambahin atribut is_checked, is_filtered, amount
+    if (
+      typeof Storage !== "undefined" &&
+      localStorage.getItem("data") !== null
+    ) {
+      const lsData = JSON.parse(localStorage.getItem("data"));
+      // hapus data sebelumnya
+      if (lsData.filter((item) => item._id == 1).length > 0) {
+        localStorage.removeItem("data");
       }
-      console.log(dummyData);
-      tempData = JSON.parse(localStorage.getItem("data"));
-      console.log(tempData);
-      setData(tempData);
-      setFilteredData(tempData);
-      const tempSelectedData = tempData.filter((item) => item.is_checked);
-      setSelectedData(tempSelectedData);
-      if (tempSelectedData.length > 0) {
-        setTotal(tempSelectedData.reduce(getTotal, 0));
+
+      if (lsData.length > 0) {
+        tempData = lsData.map((item) => {
+          return { ...item, is_checked: false, is_filtered: false, amount: 1 };
+        });
       }
-    } else {
-      setData(dummyData);
-      setFilteredData(dummyData);
-      const tempSelectedData = dummyData.filter((item) => item.is_checked);
-      setSelectedData(tempSelectedData);
-      if (tempSelectedData.length > 0) {
-        setTotal(tempSelectedData.reduce(getTotal, 0));
-      }
-      // setTotal(getTotal(dummyData.filter((item) => item.is_checked)), 0);
     }
+    fetch("/api/pengeluaran/all")
+      .then((data) => data.json())
+      .then((dataJson) => {
+        // remap data
+
+        const dataFetch = dataJson.data.map((item) => {
+          return { ...item, is_checked: false, is_filtered: false, amount: 1 };
+        });
+        // kalau ada tempData, taruh di atas list
+        console.log(dataFetch);
+        if (tempData) {
+          setData(() => [...tempData, ...dataFetch]);
+          setFilteredData(() => [...tempData, ...dataFetch]);
+        } else {
+          setData(dataFetch);
+          setFilteredData(dataFetch);
+        }
+      })
+      .catch((e) => console.log(e));
   }, []);
 
   const getTotal = (total, item) => {
@@ -195,25 +209,29 @@ export default function Home() {
   };
 
   const pengeluaranClickHandler = (id) => {
-    // const tempData = data.map((item) => {
-    //   if (item._id == id) {
-    //     item.is_checked = !item.is_checked;
-    //   }
-    //   return item;
-    // });
-    let updatedData = data.filter((item) => item._id == id)[0];
-    updatedData.is_checked = !updatedData.is_checked;
-    updatedData.amount = 1;
-    let tempData = updateDataById(updatedData, data);
-    console.log(tempData);
-    setData(tempData);
-    const tempSelectedData = tempData.filter((item) => item.is_checked);
+    let updatedItem;
+    let updatedData = data.map((item) => {
+      if (item._id == id) {
+        updatedItem = { ...item, is_checked: !item.is_checked, amount: 1 };
+        return updatedItem;
+      }
+      return item;
+    });
+    console.log(updatedData);
+    setData(updatedData);
+    // taruh data yang diklik ke paling bawah
+    const tempSelectedData = [
+      ...updatedData.filter((item) => item.is_checked && item._id != id),
+    ];
+    if (updatedItem.is_checked) {
+      tempSelectedData.push(updatedItem);
+    }
     setSelectedData(tempSelectedData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData((prev) =>
       prev.map((item) => {
-        if (item._id == updatedData._id) {
-          return updatedData;
+        if (item._id == id) {
+          return updatedItem;
         }
         return item;
       })
@@ -221,7 +239,14 @@ export default function Home() {
   };
 
   const updateDataHandler = (item) => {
-    const tempData = updateDataById(item, data);
+    console.log(item);
+    let tempData = updateDataById(item);
+    tempData = data.map((d) => {
+      if (d._id == tempData._id) {
+        return tempData;
+      }
+      return d;
+    });
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
@@ -230,15 +255,18 @@ export default function Home() {
   };
 
   const addDataHandler = (kategori, nama, biaya) => {
-    const tempData = addData(kategori, nama, biaya, data);
+    let tempData = addData(kategori, nama, biaya);
+    tempData = [tempData, ...data];
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
     setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
   };
+
   const deleteDataHandler = (id) => {
-    const tempData = deleteData(id, data);
+    deleteData(id);
+    let tempData = data.filter((item) => item._id != id);
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
