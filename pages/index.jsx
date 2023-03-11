@@ -168,7 +168,9 @@ export default function Home() {
       if (localStorage.getItem("data") === null) {
         localStorage.setItem("data", JSON.stringify(dummyData));
       }
+      console.log(dummyData);
       tempData = JSON.parse(localStorage.getItem("data"));
+      console.log(tempData);
       setData(tempData);
       setFilteredData(tempData);
       const tempSelectedData = tempData.filter((item) => item.is_checked);
