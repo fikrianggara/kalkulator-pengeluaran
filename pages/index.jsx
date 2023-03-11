@@ -1,5 +1,6 @@
 import { addData, data as dummyData, updateDataById, deleteData } from "@/data";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   IconCircleCheckFilled,
   IconCopy,
@@ -7,11 +8,13 @@ import {
   IconPencil,
   IconX,
   IconTrash,
+  IconLogin,
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
   Modal as ModalCard,
   ModalCreate as ModalCreateCard,
+  Login as LoginCard,
 } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
 const TITLE = "Kalkulator Pengeluaran";
@@ -321,6 +324,17 @@ export default function Home() {
           </h1>
         </div>
       </nav>
+      <div className="w-11/12 md:w-8/12 lg:w-6/12 bg-white m-auto rounded-xl h-fit p-4 space-y-2 shadow">
+        <div className="flex justify-between ">
+          <h1 className="text-lg font-medium text-gray-600">Provinsi Jambi</h1>
+          <Link
+            className="py-1 px-4 rounded-md bg-blue-500 duration-200 ease-in-out hover:bg-blue-400 hover:cursor-pointer shadow-blue-100"
+            href="/admin/login"
+          >
+            <IconLogin size={24} color="white" />
+          </Link>
+        </div>
+      </div>
       <HomeCard title="Kategori Pengeluaran">
         <div className="space-y-2">
           {isOpen && (

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React, { useState } from "react";
 
 export const Home = ({ children, title }) => {
@@ -222,6 +223,18 @@ export const AutoCompleteInput = ({ data, callback, title }) => {
             </ul>
           </div>
         )}
+      </div>
+    </div>
+  );
+};
+
+export const Login = ({ children }) => {
+  const [token, setToken] = useState("");
+  return (
+    <div className="flex m-auto items-center h-screen w-screen bg-gray-50 justify-center ">
+      <div className="w-11/12 h-56 sm:w-64 bg-white rounded-lg shadow-lg p-4 space-y-8">
+        <h1 className="text-lg font-medium text-gray-600 text-center">Login</h1>
+        {children}
       </div>
     </div>
   );
