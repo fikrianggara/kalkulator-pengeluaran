@@ -179,7 +179,7 @@ export const getDataById = (id) => {
 };
 
 export const updateDataById = (updatedData) => {
-  const data = getData();
+  let data = getData();
   const remappedData = {
     _id: updatedData._id,
     kategori: updatedData.kategori,
@@ -187,6 +187,10 @@ export const updateDataById = (updatedData) => {
     biaya: updatedData.biaya,
     is_created_by_user: true,
   };
+  // console.log("data", data);
+  if (!data) {
+    data = [];
+  }
   const res = data.map((item) => {
     if (item._id === updatedData._id) {
       return { ...remappedData };
