@@ -150,7 +150,7 @@ export const ModalKomoditi = ({ item, callback, updateDataCallback }) => {
               (k) => k.satuan_subsatuan == selected_satuan
             )[0].faktor_pengali
           }{" "}
-          Kg
+          {item.satuan_standar}
         </div>
         <div className=" flex space-x-4 items-center w-full">
           <div
