@@ -8,7 +8,7 @@ import {
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-const layout = ({ children }) => {
+const Layout = ({ children }) => {
   const router = useRouter();
 
   return (
@@ -59,4 +59,4 @@ const layout = ({ children }) => {
   );
 };
 
-export default layout;
+export default Layout;
