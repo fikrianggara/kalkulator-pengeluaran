@@ -12,13 +12,10 @@ import {
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
-  Modal as ModalCard,
   ModalCreate as ModalCreateCard,
-  Login as LoginCard,
+  ModalKomoditi as ModalKomoditiCard,
 } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
-
-const TITLE = "Kalkulator Pengeluaran";
 
 const formatter = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -30,14 +27,14 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
     <ul className="text-sm space-y-2 h-[200px] overflow-y-auto scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
       {data.map((item) => (
         <li
-          key={item._id}
+          key={item.id}
           className="flex justify-between space-x-2 bg-gray-50 p-2 rounded-lg pr-4 items-center"
         >
           <div
             className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out ${
               item.is_checked ? "text-green-500" : ""
             }`}
-            onClick={(e) => callback(item._id)}
+            onClick={(e) => callback(item.id)}
             disabled={item.is_checked}
           >
             {item.is_checked ? (
@@ -45,21 +42,22 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
             ) : (
               <IconCirclePlus size={24} stroke={2} color="gray" />
             )}
-            <span
-              className={`font-medium ${
+            <div
+              className={`${
                 item.is_checked ? "text-green-500 hover:text-blue-500" : ""
               }`}
             >
-              {item.kategori}
-            </span>
-            <span>-</span>
-            <span>{item.nama}</span>
+              <span className={`font-medium `}>
+                {item.id_komoditas.split("_")[0]}
+              </span>
+              <span> {item.id_komoditas.split("_")[1]}</span>
+            </div>
           </div>
           {item.is_created_by_user && (
             <div
               className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
               onClick={() => {
-                deleteDataCallback(item._id);
+                deleteDataCallback(item.id);
               }}
             >
               <IconTrash size={20} />
@@ -85,7 +83,7 @@ export const ListSelectedItem = ({
     <>
       {isOpen && (
         <FormModal callback={onModalClickHandler}>
-          <ModalCard
+          <ModalKomoditiCard
             item={modalItem}
             callback={onModalClickHandler}
             updateDataCallback={updateDataCallback}
@@ -95,14 +93,14 @@ export const ListSelectedItem = ({
       <ul className="text-sm space-y-2">
         {data.map((item) => (
           <li
-            key={item._id}
+            key={item.id}
             className={`flex space-x-2 bg-gray-50 p-2 rounded-lg shadow`}
           >
             <div className="flex w-full items-center space-x-4">
               <div
                 className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
                 onClick={() => {
-                  deleteDataCallback(item._id);
+                  deleteDataCallback(item.id);
                 }}
               >
                 <IconX size={20} />
@@ -117,15 +115,29 @@ export const ListSelectedItem = ({
                 <IconPencil size={20} />
               </div>
 
-              <div className="flex space-x-2 md:space-x-4 items-center overflow-x-auto text-xs md:text-regular p-2">
-                <span>{item.amount}</span>
-                <span>
-                  <IconX size={16} />
-                </span>
-                <div className="flex-1">{item.nama}</div>
-                <span> ({formatter.format(item.biaya)})</span>
-                <span>=</span>
-                <span>{formatter.format(item.biaya * item.amount)}</span>
+              <div className="flex sm:space-x-2 md:space-x-4 items-center overflow-x-auto text-xs md:text-regular p-2 flex-col sm:flex-row space-y-2 sm:space-y-0 items-start justify-start">
+                <div className="self-start">
+                  {item.id_komoditas.split("_")[1]}
+                </div>
+                <div
+                  className="self-start flex"
+                  onClick={() => {
+                    setIsOpen((prev) => !prev);
+                    setModalItem(item);
+                  }}
+                >
+                  <span>
+                    {item.amount} {item.konversi[0].satuan_subsatuan}
+                  </span>
+                  <span>=</span>
+                  <span className="font-bold">
+                    {item.amount * item.konversi[0].faktor_pengali}
+                  </span>{" "}
+                  <span className="font-bold">{item.satuan_standar}</span>
+                </div>
+                {/* <span> ({formatter.format(item.biaya)})</span> */}
+
+                {/* <span>{formatter.format(item.biaya * item.amount)}</span> */}
                 {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
               </div>
             </div>
@@ -136,7 +148,10 @@ export const ListSelectedItem = ({
   );
 };
 
-export const SearchForm = ({ callback }) => {
+export const SearchForm = ({
+  placeholder = "cari kategori pengeluaran",
+  callback,
+}) => {
   const [searchInput, setSearchInput] = useState("");
   const onChangeHandler = (e) => {
     setSearchInput(e.target.value);
@@ -146,7 +161,7 @@ export const SearchForm = ({ callback }) => {
     <div className="border-[0.5px] rounded-lg bg-gray-100 w-full md:w-11/12 lg:w-8/12 m-auto">
       <input
         type="text"
-        placeholder="cari kategori pengeluaran"
+        placeholder={placeholder}
         className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
         value={searchInput}
@@ -162,10 +177,11 @@ export default function Home() {
   const [selectedData, setSelectedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
+  const [uniqueKomoditas, setUniqueKomoditas] = useState([]);
   const [showTooltip, setShowTooltip] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
-  let pengeluaranComp;
+  let komoditiComp;
 
   useEffect(() => {
     let tempData;
@@ -173,9 +189,9 @@ export default function Home() {
     // ambil data itu, tambahin atribut is_checked, is_filtered, amount
     if (
       typeof Storage !== "undefined" &&
-      localStorage.getItem("data") !== null
+      localStorage.getItem("data_komoditas") !== null
     ) {
-      const lsData = JSON.parse(localStorage.getItem("data"));
+      const lsData = JSON.parse(localStorage.getItem("data_komoditas"));
       // hapus data sebelumnya
       if (lsData.filter((item) => item._id == 1).length > 0) {
         localStorage.removeItem("data");
@@ -187,7 +203,7 @@ export default function Home() {
         });
       }
     }
-    fetch("/api/pengeluaran/all")
+    fetch("/api/komoditas/all")
       .then((data) => data.json())
       .then((dataJson) => {
         // remap data
@@ -195,46 +211,66 @@ export default function Home() {
         const dataFetch = dataJson.data.map((item) => {
           return { ...item, is_checked: false, is_filtered: false, amount: 1 };
         });
+
+        const uniqueKomoditas = [
+          ...new Set(dataJson.data.map((item) => item.id_komoditas)),
+        ].map((id_komoditas, id) => {
+          let tempData = dataFetch.filter((item) =>
+            item.id_komoditas.includes(id_komoditas)
+          );
+
+          return {
+            id,
+            id_komoditas,
+            is_checked: false,
+            is_filtered: false,
+            satuan_standar: tempData[0].satuan_standar,
+            konversi: tempData.map((item) => {
+              return {
+                satuan_standar: item.satuan_standar,
+                satuan_subsatuan: item.satuan_subsatuan,
+                faktor_pengali: item.faktor_pengali,
+              };
+            }),
+            amount: 1,
+          };
+        });
         // kalau ada tempData, taruh di atas list
-        console.log(dataFetch);
         if (tempData) {
           setData(() => [...tempData, ...dataFetch]);
-          setFilteredData(() => [...tempData, ...dataFetch]);
+          setUniqueKomoditas([...tempData, ...uniqueKomoditas]);
+          setFilteredData(() => [...tempData, ...uniqueKomoditas]);
         } else {
           setData(dataFetch);
-          setFilteredData(dataFetch);
+          setUniqueKomoditas(uniqueKomoditas);
+          setFilteredData(uniqueKomoditas);
         }
       })
       .catch((e) => console.log(e));
   }, []);
 
-  const getTotal = (total, item) => {
-    return total + item.biaya * item.amount;
-  };
-
-  const pengeluaranClickHandler = (id) => {
+  const komoditasClickHandler = (id) => {
     let updatedItem;
-    let updatedData = data.map((item) => {
-      if (item._id == id) {
+    let updatedData = uniqueKomoditas.map((item) => {
+      if (item.id == id) {
         updatedItem = { ...item, is_checked: !item.is_checked, amount: 1 };
         return updatedItem;
       }
       return item;
     });
     console.log(updatedData);
-    setData(updatedData);
+    setUniqueKomoditas(updatedData);
     // taruh data yang diklik ke paling bawah
     const tempSelectedData = [
-      ...updatedData.filter((item) => item.is_checked && item._id != id),
+      ...updatedData.filter((item) => item.is_checked && item.id != id),
     ];
     if (updatedItem.is_checked) {
       tempSelectedData.push(updatedItem);
     }
     setSelectedData(tempSelectedData);
-    setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData((prev) =>
       prev.map((item) => {
-        if (item._id == id) {
+        if (item.id == id) {
           return updatedItem;
         }
         return item;
@@ -243,7 +279,6 @@ export default function Home() {
   };
 
   const updateDataHandler = (item) => {
-    console.log(item);
     let tempData = updateDataById(item);
     tempData = data.map((d) => {
       if (d._id == tempData._id) {
@@ -254,7 +289,6 @@ export default function Home() {
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
-    setTotal(tempSelectedData.reduce(getTotal, 0));
     // setFilteredData(tempData);
   };
 
@@ -264,7 +298,6 @@ export default function Home() {
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
-    setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
   };
 
@@ -274,7 +307,6 @@ export default function Home() {
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setData(tempData);
-    setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
   };
   const onModalClickHandler = () => {
@@ -288,12 +320,12 @@ export default function Home() {
       </div>
     );
   } else {
-    pengeluaranComp = (
+    komoditiComp = (
       <>
         {filteredData.length > 0 ? (
           <ListItem
             data={filteredData}
-            callback={pengeluaranClickHandler}
+            callback={komoditasClickHandler}
             deleteDataCallback={deleteDataHandler}
           />
         ) : (
@@ -305,12 +337,10 @@ export default function Home() {
   const searchChangeHandler = (input) => {
     const filterInput = input.toLowerCase();
     if (filterInput.length < 1) {
-      setFilteredData(data);
+      setFilteredData(uniqueKomoditas);
     } else {
-      const tempData = data.filter((item) => {
-        const temp =
-          "" + item.kategori.toLowerCase() + "-" + item.nama.toLowerCase();
-        return temp.includes(filterInput);
+      const tempData = uniqueKomoditas.filter((item) => {
+        return item.id_komoditas.toLowerCase().includes(filterInput);
       });
       setFilteredData(tempData);
     }
@@ -318,7 +348,7 @@ export default function Home() {
 
   return (
     <>
-      <HomeCard title="Kalkulator Pengeluaran">
+      <HomeCard title="Konversi Satuan Komoditas">
         <div className="space-y-2">
           {isOpen && (
             <div className="">
@@ -332,45 +362,25 @@ export default function Home() {
               </FormModal>
             </div>
           )}
-          <SearchForm callback={searchChangeHandler} />
-          {pengeluaranComp}
-          <div
+          <SearchForm
+            callback={searchChangeHandler}
+            placeholder="Cari komoditas"
+          />
+          {komoditiComp}
+          {/* <div
             className={`flex space-x-2 hover:bg-gray-50  hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
             onClick={onModalClickHandler}
           >
             <div className="flex m-auto">
               <IconCirclePlus size={30} stroke={2} color="gray" />
             </div>
-          </div>
+          </div> */}
         </div>
       </HomeCard>
       <HomeCard
         title={
           <div className="flex justify-between">
-            <span>Pengeluaran</span>
-            <div className="flex space-x-4 relative">
-              Total-
-              <div
-                className="flex space-x-2 items-center w-fit text-blue-500 hover:cursor-pointer hover:underline"
-                onClick={() => {
-                  navigator.clipboard.writeText(total);
-                  setShowTooltip(true);
-                  setTimeout(() => setShowTooltip(false), 2500);
-                }}
-              >
-                <span>{formatter.format(total)}</span>
-
-                <IconCopy size={20} />
-              </div>
-              <span
-                className="absolute -bottom-6 right-2 bg-gray-100 px-2 py-1 rounded text-xs duration-1000 text-black shadow-md z-20"
-                style={{
-                  display: showTooltip ? "block" : "none",
-                }}
-              >
-                Nilai disalin !
-              </span>
-            </div>
+            <span>Komoditas</span>
           </div>
         }
       >
@@ -378,51 +388,14 @@ export default function Home() {
           <ListSelectedItem
             data={selectedData}
             updateDataCallback={updateDataHandler}
-            deleteDataCallback={pengeluaranClickHandler}
+            deleteDataCallback={komoditasClickHandler}
           />
         ) : (
           <div className="m-auto text-center text-gray-400">
-            Belum ada Pengeluaran
+            Belum ada Komoditas
           </div>
         )}
       </HomeCard>
     </>
   );
-  // // <main className="bg-gray-50 min-h-screen space-y-4 relative pb-48">
-  //   <nav className="p-4 bg-gray-100 shadow">
-  //     <div>
-  //       <h1 className="text-gray-700 text-xl text-center font-medium">
-  //         {TITLE}
-  //       </h1>
-  //     </div>
-  //   </nav>
-  {
-    /* <div className="w-11/12 md:w-8/12 lg:w-6/12 bg-white m-auto rounded-xl h-fit p-4 space-y-2 shadow">
-        <div className="flex justify-between ">
-          <h1 className="text-lg font-medium text-gray-600">Provinsi Jambi</h1>
-          <Link
-            className="py-1 px-4 rounded-md bg-blue-500 duration-200 ease-in-out hover:bg-blue-400 hover:cursor-pointer shadow-blue-100"
-            href="/admin/login"
-          >
-            <IconLogin size={24} color="white" />
-          </Link>
-        </div>
-      </div> */
-  }
-
-  {
-    /* <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-sm md:text-base text-gray-600 absolute bottom-0 inset-x-0">
-        Made by{" "}
-        <a href="https://github.com/fikrianggara" className="text-blue-500">
-          Fikri Septrian A.
-        </a>
-        , in collaboration with{" "}
-        <a href="https://tanjabtimkab.bps.go.id/" className="text-blue-500">
-          BPS Tanjung Jabung Timur
-        </a>
-      </footer> */
-  }
-  {
-    /* </main> */
-  }
 }
