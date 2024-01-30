@@ -89,27 +89,17 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
 
 export const ModalKomoditi = ({ item, callback, updateDataCallback }) => {
   const [amount, setAmount] = useState(item.amount);
-  const [biaya, setBiaya] = useState(item.faktor_pengali);
-
-  const isInputValid = (biaya) => {
-    const alphabets = /[a-zA-Z]/g;
-    return !alphabets.test(biaya);
-  };
-
+  const [selected_satuan, setSelectedSatuan] = useState(item.selected_satuan);
   const onUpdateClickHandler = () => {
-    if (isInputValid) {
-      const itemUpdate = {
-        ...item,
-        amount: parseInt(amount),
-        biaya: parseInt(biaya),
-      };
-      updateDataCallback(itemUpdate);
-      callback();
-    } else {
-      setBiaya("");
-    }
+    const itemUpdate = {
+      ...item,
+      amount: parseInt(amount),
+      selected_satuan: selected_satuan,
+    };
+    // console.log(itemUpdate);
+    updateDataCallback(itemUpdate);
+    callback();
   };
-
   return (
     <div className="absolute text-xl text-black inset-0 m-auto items-center w-fit h-fit bg-white z-20 rounded-xl p-4 space-y-4 pb-8 shadow-lg">
       <h1 className="text-xl text-center font-medium text-gray-600">
@@ -120,7 +110,7 @@ export const ModalKomoditi = ({ item, callback, updateDataCallback }) => {
         <ul className="flex flex-col items-center space-y-4">
           <li key="nama" className="flex space-x-4 w-full justify-between">
             <span className="font-medium text-gray-600 flex-1">nama</span>
-            <span className="flex-1">{item.nama}</span>
+            <span className="flex-1">{item.id_komoditas.split("_")[1]}</span>
           </li>
           <li key="amount" className="flex space-x-4 w-full justify-between">
             <span className="font-medium text-gray-600 flex-1">jumlah</span>
@@ -133,16 +123,34 @@ export const ModalKomoditi = ({ item, callback, updateDataCallback }) => {
             />
           </li>
           <li key="biaya" className="flex space-x-4 w-full justify-between">
-            <span className="font-medium text-gray-600 flex-1">biaya</span>
-            <input
-              type="text"
-              value={biaya}
-              onChange={(e) => setBiaya(e.target.value)}
+            <span className="font-medium text-gray-600 flex-1">Satuan</span>
+            <select
+              name="satuan"
+              id="satuan"
               className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
-            />
+              onChange={(e) => setSelectedSatuan(e.target.value)}
+            >
+              {item.konversi.map((item) => (
+                <option
+                  value={item.satuan_subsatuan}
+                  key={item.satuan_subsatuan}
+                >
+                  {item.satuan_subsatuan}
+                </option>
+              ))}
+            </select>
           </li>
         </ul>
+        <div className="text-left text-gray-400 text-sm w-full">
+          1 {selected_satuan} ={" "}
+          {
+            item.konversi.filter(
+              (k) => k.satuan_subsatuan == selected_satuan
+            )[0].faktor_pengali
+          }{" "}
+          Kg
+        </div>
         <div className=" flex space-x-4 items-center w-full">
           <div
             className="flex-1 p-2 text-center relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"

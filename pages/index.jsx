@@ -196,7 +196,6 @@ export default function Home() {
           return { ...item, is_checked: false, is_filtered: false, amount: 1 };
         });
         // kalau ada tempData, taruh di atas list
-        console.log(dataFetch);
         if (tempData) {
           setData(() => [...tempData, ...dataFetch]);
           setFilteredData(() => [...tempData, ...dataFetch]);

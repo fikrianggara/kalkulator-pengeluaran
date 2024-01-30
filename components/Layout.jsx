@@ -20,29 +20,37 @@ const Layout = ({ children }) => {
           </h1>
         </div>
       </nav>
-      <div className="w-full bg-green-500 fixed bottom-0 z-20 bg-white p-4">
-        <div className="w-11/12 md:w-8/12 lg:w-6/12 bg-white m-auto flex justify-evenly items-center h-fit">
-          <Link
-            href={"/"}
-            className="px-6 py-2 rounded-lg hover:bg-gray-50 border border-gray-200 hover:border-gray-400 text-gray-400 hover:text-gray-500 duration-300 ease-in-out"
-          >
-            {router.pathname == "/" ? (
-              <IconCalculatorFilled size={24} />
-            ) : (
-              <IconCalculator size={24} />
-            )}
-          </Link>
-          <Link
-            href={"/konversi"}
-            className="px-6 py-2 rounded-lg hover:bg-gray-50 border border-gray-200 hover:border-gray-400 text-gray-400 hover:text-gray-500 duration-300 ease-in-out"
-          >
-            {router.pathname == "/" ? (
-              <IconTransform size={24} />
-            ) : (
-              <IconTransformFilled size={24} />
-            )}
-          </Link>
-        </div>
+      <div className="w-full bg-green-500 fixed bottom-0 z-20 bg-white flex">
+        <Link
+          href={"/"}
+          className={`flex-1 hover:bg-gray-200 text-gray-400 hover:text-gray-500 duration-300 ease-in-out p-4 text-center flex items-center justify-center 
+          ${
+            router.pathname == "/"
+              ? " border-t-2 border-blue-500"
+              : " border-t-0"
+          }`}
+        >
+          {router.pathname == "/" ? (
+            <IconCalculatorFilled size={24} />
+          ) : (
+            <IconCalculator size={24} />
+          )}
+        </Link>
+        <Link
+          href={"/konversi"}
+          className={`flex-1 hover:bg-gray-200 text-gray-400 hover:text-gray-500 duration-300 ease-in-out p-4 text-center flex items-center justify-center 
+          ${
+            router.pathname == "/konversi"
+              ? " border-t-2 border-blue-500"
+              : " border-t-0"
+          }`}
+        >
+          {router.pathname == "/" ? (
+            <IconTransform size={24} />
+          ) : (
+            <IconTransformFilled size={24} />
+          )}
+        </Link>
       </div>
       {children}
       <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-sm md:text-base text-gray-600 absolute bottom-0 inset-x-0 pb-36">

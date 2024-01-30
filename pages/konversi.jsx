@@ -76,9 +76,11 @@ export const ListSelectedItem = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalItem, setModalItem] = useState(null);
+
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
+
   return (
     <>
       {isOpen && (
@@ -127,18 +129,17 @@ export const ListSelectedItem = ({
                   }}
                 >
                   <span>
-                    {item.amount} {item.konversi[0].satuan_subsatuan}
+                    {Math.round(item.amount * 100) / 100} {item.selected_satuan}
                   </span>
                   <span>=</span>
                   <span className="font-bold">
-                    {item.amount * item.konversi[0].faktor_pengali}
+                    {item.amount *
+                      item.konversi.filter(
+                        (k) => k.satuan_subsatuan == item.selected_satuan
+                      )[0].faktor_pengali}
                   </span>{" "}
                   <span className="font-bold">{item.satuan_standar}</span>
                 </div>
-                {/* <span> ({formatter.format(item.biaya)})</span> */}
-
-                {/* <span>{formatter.format(item.biaya * item.amount)}</span> */}
-                {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
               </div>
             </div>
           </li>
@@ -225,6 +226,7 @@ export default function Home() {
             is_checked: false,
             is_filtered: false,
             satuan_standar: tempData[0].satuan_standar,
+            selected_satuan: tempData[0].satuan_subsatuan,
             konversi: tempData.map((item) => {
               return {
                 satuan_standar: item.satuan_standar,
@@ -279,16 +281,18 @@ export default function Home() {
   };
 
   const updateDataHandler = (item) => {
-    let tempData = updateDataById(item);
-    tempData = data.map((d) => {
-      if (d._id == tempData._id) {
-        return tempData;
+    // let tempData = updateDataById(item);
+    const tempData = uniqueKomoditas.map((d) => {
+      if (d.id == item.id) {
+        console.log(item);
+        return item;
       }
       return d;
     });
     const tempSelectedData = tempData.filter((item) => item.is_checked);
+    console.log(tempData);
     setSelectedData(tempSelectedData);
-    setData(tempData);
+    setUniqueKomoditas(tempData);
     // setFilteredData(tempData);
   };
 
@@ -367,14 +371,6 @@ export default function Home() {
             placeholder="Cari komoditas"
           />
           {komoditiComp}
-          {/* <div
-            className={`flex space-x-2 hover:bg-gray-50  hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
-            onClick={onModalClickHandler}
-          >
-            <div className="flex m-auto">
-              <IconCirclePlus size={30} stroke={2} color="gray" />
-            </div>
-          </div> */}
         </div>
       </HomeCard>
       <HomeCard
