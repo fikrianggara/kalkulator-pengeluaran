@@ -260,7 +260,6 @@ export default function Home() {
       }
       return item;
     });
-    console.log(updatedData);
     setUniqueKomoditas(updatedData);
     // taruh data yang diklik ke paling bawah
     const tempSelectedData = [
@@ -284,13 +283,11 @@ export default function Home() {
     // let tempData = updateDataById(item);
     const tempData = uniqueKomoditas.map((d) => {
       if (d.id == item.id) {
-        console.log(item);
         return item;
       }
       return d;
     });
     const tempSelectedData = tempData.filter((item) => item.is_checked);
-    console.log(tempData);
     setSelectedData(tempSelectedData);
     setUniqueKomoditas(tempData);
     // setFilteredData(tempData);
