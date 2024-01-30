@@ -127,6 +127,7 @@ export const ModalKomoditi = ({ item, callback, updateDataCallback }) => {
             <select
               name="satuan"
               id="satuan"
+              defaultValue={item.selected_satuan}
               className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
               onChange={(e) => setSelectedSatuan(e.target.value)}
