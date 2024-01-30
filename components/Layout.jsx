@@ -53,14 +53,18 @@ const Layout = ({ children }) => {
         </Link>
       </div>
       {children}
-      <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-sm md:text-base text-gray-600 absolute bottom-0 inset-x-0 pb-36">
+      <footer className="h-24 p-4 bg-gray-100 font-medium text-center m-auto text-xs md:text-sm text-gray-600 absolute bottom-0 inset-x-0 pb-36">
         Made by{" "}
         <a href="https://github.com/fikrianggara" className="text-blue-500">
-          Fikri Septrian A.
+          Fikri S.A
         </a>
         , in collaboration with{" "}
         <a href="https://tanjabtimkab.bps.go.id/" className="text-blue-500">
           BPS Tanjung Jabung Timur
+        </a>
+        , and{" "}
+        <a href="https://tanjabarkab.bps.go.id/" className="text-blue-500">
+          BPS Tanjung Jabung Barat
         </a>
       </footer>
     </main>
