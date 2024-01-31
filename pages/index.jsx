@@ -214,7 +214,6 @@ export default function Home() {
       }
       return item;
     });
-    console.log(updatedData);
     setData(updatedData);
     // taruh data yang diklik ke paling bawah
     const tempSelectedData = [
@@ -236,7 +235,6 @@ export default function Home() {
   };
 
   const updateDataHandler = (item) => {
-    console.log(item);
     let tempData = updateDataById(item);
     tempData = data.map((d) => {
       if (d._id == tempData._id) {

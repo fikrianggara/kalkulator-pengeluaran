@@ -420,12 +420,6 @@ export default function Home() {
                 reset pilihan
               </div>
             )}
-            {/* <div
-              onClick={onModalClickHandler}
-              className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
-            >
-              <IconCirclePlus size={30} stroke={2} />
-            </div> */}
           </div>
         </div>
       </HomeCard>
