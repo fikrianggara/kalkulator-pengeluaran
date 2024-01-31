@@ -31,7 +31,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
           className="flex justify-between space-x-2 bg-gray-50 p-2 rounded-lg pr-4 items-center"
         >
           <div
-            className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out ${
+            className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out text-sm ${
               item.is_checked ? "text-green-500" : ""
             }`}
             onClick={(e) => callback(item.id)}
@@ -50,6 +50,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
               <span className={`font-medium `}>
                 {item.id_komoditas.split("_")[0]}
               </span>
+              {" - "}
               <span> {item.id_komoditas.split("_")[1]}</span>
             </div>
           </div>
@@ -403,19 +404,19 @@ export default function Home() {
             placeholder="Cari komoditas"
           />
           {komoditiComp}
-          <div className="flex m-auto w-full justify-between items-center">
+          <div className="flex m-auto w-full justify-between items-center p-2">
             <div
               className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 duration-200 ease-in-out hover:cursor-pointer"
               onClick={resetSelection}
             >
               reset pilihan
             </div>
-            <div
+            {/* <div
               onClick={onModalClickHandler}
               className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
             >
               <IconCirclePlus size={30} stroke={2} />
-            </div>
+            </div> */}
           </div>
         </div>
       </HomeCard>
