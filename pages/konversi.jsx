@@ -204,6 +204,7 @@ export default function Home() {
         });
       }
     }
+
     fetch("/api/komoditas/all")
       .then((data) => data.json())
       .then((dataJson) => {
@@ -314,6 +315,40 @@ export default function Home() {
     setIsOpen((prev) => !prev);
   };
 
+  const resetSelection = () => {
+    const dataFetch = data.map((item) => {
+      return { ...item, is_checked: false, is_filtered: false, amount: 1 };
+    });
+    const uniqueKomoditas = [
+      ...new Set(data.map((item) => item.id_komoditas)),
+    ].map((id_komoditas, id) => {
+      let tempData = dataFetch.filter((item) =>
+        item.id_komoditas.includes(id_komoditas)
+      );
+
+      return {
+        id,
+        id_komoditas,
+        is_checked: false,
+        is_filtered: false,
+        satuan_standar: tempData[0].satuan_standar,
+        selected_satuan: tempData[0].satuan_subsatuan,
+        konversi: tempData.map((item) => {
+          return {
+            satuan_standar: item.satuan_standar,
+            satuan_subsatuan: item.satuan_subsatuan,
+            faktor_pengali: item.faktor_pengali,
+          };
+        }),
+        amount: 1,
+      };
+    });
+    setData(dataFetch);
+    setUniqueKomoditas(uniqueKomoditas);
+    setFilteredData(uniqueKomoditas);
+    setSelectedData([]);
+  };
+
   if (!data) {
     return (
       <div>
@@ -368,6 +403,20 @@ export default function Home() {
             placeholder="Cari komoditas"
           />
           {komoditiComp}
+          <div className="flex m-auto w-full justify-between items-center">
+            <div
+              className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 duration-200 ease-in-out hover:cursor-pointer"
+              onClick={resetSelection}
+            >
+              reset pilihan
+            </div>
+            <div
+              onClick={onModalClickHandler}
+              className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
+            >
+              <IconCirclePlus size={30} stroke={2} />
+            </div>
+          </div>
         </div>
       </HomeCard>
       <HomeCard

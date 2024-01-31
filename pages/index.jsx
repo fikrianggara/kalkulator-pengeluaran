@@ -35,7 +35,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
         >
           <div
             className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out ${
-              item.is_checked ? "text-green-500" : ""
+              item.is_checked ? "text-green-500 hover:text-blue-500" : ""
             }`}
             onClick={(e) => callback(item._id)}
             disabled={item.is_checked}
@@ -45,13 +45,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
             ) : (
               <IconCirclePlus size={24} stroke={2} color="gray" />
             )}
-            <span
-              className={`font-medium ${
-                item.is_checked ? "text-green-500 hover:text-blue-500" : ""
-              }`}
-            >
-              {item.kategori}
-            </span>
+            <span>{item.kategori}</span>
             <span>-</span>
             <span>{item.nama}</span>
           </div>
@@ -276,6 +270,17 @@ export default function Home() {
     setTotal(tempSelectedData.reduce(getTotal, 0));
     setFilteredData(tempData);
   };
+
+  const resetSelection = () => {
+    const dataFetch = data.map((item) => {
+      return { ...item, is_checked: false, is_filtered: false, amount: 1 };
+    });
+    setData(dataFetch);
+    setFilteredData(dataFetch);
+    setSelectedData([]);
+    setTotal(0);
+  };
+
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
@@ -334,11 +339,21 @@ export default function Home() {
           <SearchForm callback={searchChangeHandler} />
           {pengeluaranComp}
           <div
-            className={`flex space-x-2 hover:bg-gray-50  hover:cursor-pointer p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
-            onClick={onModalClickHandler}
+            className={`flex space-x-2 p-2 text-gray-600 rounded-lg duration-200 ease-in-out text-center`}
           >
-            <div className="flex m-auto">
-              <IconCirclePlus size={30} stroke={2} color="gray" />
+            <div className="flex m-auto w-full justify-between items-center">
+              <div
+                className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 duration-200 ease-in-out hover:cursor-pointer"
+                onClick={resetSelection}
+              >
+                reset pilihan
+              </div>
+              <div
+                onClick={onModalClickHandler}
+                className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
+              >
+                <IconCirclePlus size={30} stroke={2} />
+              </div>
             </div>
           </div>
         </div>
