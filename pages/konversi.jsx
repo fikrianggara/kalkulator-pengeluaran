@@ -405,12 +405,21 @@ export default function Home() {
           />
           {komoditiComp}
           <div className="flex m-auto w-full justify-between items-center p-2">
-            <div
-              className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 duration-200 ease-in-out hover:cursor-pointer"
-              onClick={resetSelection}
-            >
-              reset pilihan
-            </div>
+            {selectedData.length > 0 ? (
+              <div
+                className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 hover:text-gray-600 hover:border-gray-400 hover:bg-gray-100 duration-200 ease-in-out hover:cursor-pointer"
+                onClick={resetSelection}
+              >
+                reset pilihan
+              </div>
+            ) : (
+              <div
+                className="border rounded-lg border-gray-200 px-4 py-2 text-xs sm:text-sm text-gray-400 cursor-not-allowed"
+                // onClick={resetSelection}
+              >
+                reset pilihan
+              </div>
+            )}
             {/* <div
               onClick={onModalClickHandler}
               className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
