@@ -1,6 +1,10 @@
-import { addData, data as dummyData, updateDataById, deleteData } from "@/data";
+import {
+  addData,
+  data as dummyData,
+  updateDataById,
+  deleteData,
+} from "@/data/pengeluaran";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   IconCircleCheckFilled,
   IconCopy,
@@ -8,13 +12,11 @@ import {
   IconPencil,
   IconX,
   IconTrash,
-  IconLogin,
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
   Modal as ModalCard,
   ModalCreate as ModalCreateCard,
-  Login as LoginCard,
 } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
 
@@ -72,9 +74,11 @@ export const ListSelectedItem = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [modalItem, setModalItem] = useState(null);
+
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
   };
+
   return (
     <>
       {isOpen && (
@@ -120,7 +124,6 @@ export const ListSelectedItem = ({
                 <span> ({formatter.format(item.biaya)})</span>
                 <span>=</span>
                 <span>{formatter.format(item.biaya * item.amount)}</span>
-                {/* {item.amount} X {item.nama} - {formatter.format(item.biaya)} */}
               </div>
             </div>
           </li>

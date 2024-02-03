@@ -12,10 +12,11 @@ import {
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
-  ModalCreate as ModalCreateCard,
-  ModalKomoditi as ModalKomoditiCard,
+  ModalCreateKomoditi as ModalCreateKomoditiCard,
+  ModalUpdatelKomoditi as ModalUpdateKomoditiCard,
 } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
+import { getKomoditi } from "@/data/komoditi";
 
 const formatter = new Intl.NumberFormat("id-ID", {
   style: "currency",
@@ -86,7 +87,7 @@ export const ListSelectedItem = ({
     <>
       {isOpen && (
         <FormModal callback={onModalClickHandler}>
-          <ModalKomoditiCard
+          <ModalUpdateKomoditiCard
             item={modalItem}
             callback={onModalClickHandler}
             updateDataCallback={updateDataCallback}
@@ -184,14 +185,16 @@ export default function Home() {
   const [isOpen, setIsOpen] = useState(false);
 
   let komoditiComp;
-
   useEffect(() => {
     let tempData;
     // kalau mendukung localStorage dan ada data,
     // ambil data itu, tambahin atribut is_checked, is_filtered, amount
+    if (typeof Storage !== "undefined") {
+      console.log(getKomoditi());
+    }
     if (
       typeof Storage !== "undefined" &&
-      localStorage.getItem("data_komoditas") !== null
+      localStorage.getItem("komoditas") !== null
     ) {
       const lsData = JSON.parse(localStorage.getItem("data_komoditas"));
       // hapus data sebelumnya
@@ -390,7 +393,7 @@ export default function Home() {
           {isOpen && (
             <div className="">
               <FormModal callback={onModalClickHandler}>
-                <ModalCreateCard
+                <ModalCreateKomoditiCard
                   item={data[0]}
                   callback={onModalClickHandler}
                   addDataCallback={addDataHandler}
@@ -420,6 +423,12 @@ export default function Home() {
                 reset pilihan
               </div>
             )}
+            <div
+              onClick={onModalClickHandler}
+              className="hover:cursor-pointer hover:text-green-500 text-gray-400 duration-200 ease-in-out"
+            >
+              <IconCirclePlus size={30} stroke={2} />
+            </div>
           </div>
         </div>
       </HomeCard>
