@@ -12,30 +12,30 @@ import {
 } from "@tabler/icons-react";
 import {
   Home as HomeCard,
-  ModalCreateKomoditi as ModalCreateKomoditiCard,
-  ModalUpdatelKomoditi as ModalUpdateKomoditiCard,
+  ModalCreateKomoditas as ModalCreateKomoditasCard,
+  ModalUpdatelKomoditas as ModalUpdateKomoditasCard,
 } from "@/components/Card";
 import { Modal as FormModal } from "@/components/Modal";
-import { getKomoditi } from "@/data/komoditi";
-
-const formatter = new Intl.NumberFormat("id-ID", {
-  style: "currency",
-  currency: "IDR",
-});
+import {
+  addKomoditas,
+  deleteKomoditas,
+  getKomoditas,
+  remapUniqueKomoditas,
+} from "@/data/komoditas";
 
 export const ListItem = ({ data, callback, deleteDataCallback }) => {
   return (
     <ul className="text-sm space-y-2 h-[200px] overflow-y-auto scrollbar-thumb-gray-400 scrollbar-thin scrollbar-rounded-large scrollbar-track-gray-100">
-      {data.map((item) => (
+      {data.map((item, id) => (
         <li
-          key={item.id}
+          key={id}
           className="flex justify-between space-x-2 bg-gray-50 p-2 rounded-lg pr-4 items-center"
         >
           <div
             className={`flex flex-1 space-x-2  hover:cursor-pointer hover:text-blue-500 text-gray-600 duration-200 ease-in-out text-sm ${
               item.is_checked ? "text-green-500" : ""
             }`}
-            onClick={(e) => callback(item.id)}
+            onClick={(e) => callback(item.id_komoditas)}
             disabled={item.is_checked}
           >
             {item.is_checked ? (
@@ -59,7 +59,7 @@ export const ListItem = ({ data, callback, deleteDataCallback }) => {
             <div
               className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
               onClick={() => {
-                deleteDataCallback(item.id);
+                deleteDataCallback(item.id_komoditas);
               }}
             >
               <IconTrash size={20} />
@@ -87,7 +87,7 @@ export const ListSelectedItem = ({
     <>
       {isOpen && (
         <FormModal callback={onModalClickHandler}>
-          <ModalUpdateKomoditiCard
+          <ModalUpdateKomoditasCard
             item={modalItem}
             callback={onModalClickHandler}
             updateDataCallback={updateDataCallback}
@@ -95,16 +95,16 @@ export const ListSelectedItem = ({
         </FormModal>
       )}
       <ul className="text-sm space-y-2">
-        {data.map((item) => (
+        {data.map((item, id) => (
           <li
-            key={item.id}
+            key={id}
             className={`flex space-x-2 bg-gray-50 p-2 rounded-lg shadow`}
           >
             <div className="flex w-full items-center space-x-4">
               <div
                 className="p-2 relative text-white shadow rounded-md bg-gradient-to-tr from-red-400 to-orange-200 hover:cursor-pointer hover:shadow-lg duration-300 ease-in-out"
                 onClick={() => {
-                  deleteDataCallback(item.id);
+                  deleteDataCallback(item.id_komoditas);
                 }}
               >
                 <IconX size={20} />
@@ -176,107 +176,58 @@ export const SearchForm = ({
 
 // kita butuh, is_filtered, is_checked
 export default function Home() {
-  const [total, setTotal] = useState(0);
   const [selectedData, setSelectedData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [uniqueKomoditas, setUniqueKomoditas] = useState([]);
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
 
-  let komoditiComp;
+  let komoditasComp;
   useEffect(() => {
-    let tempData;
-    // kalau mendukung localStorage dan ada data,
-    // ambil data itu, tambahin atribut is_checked, is_filtered, amount
-    if (typeof Storage !== "undefined") {
-      console.log(getKomoditi());
-    }
-    if (
-      typeof Storage !== "undefined" &&
-      localStorage.getItem("komoditas") !== null
-    ) {
-      const lsData = JSON.parse(localStorage.getItem("data_komoditas"));
-      // hapus data sebelumnya
-      if (lsData.filter((item) => item._id == 1).length > 0) {
-        localStorage.removeItem("data");
+    let komoditas;
+    console.log("checking local storage...");
+    if (window.localStorage !== undefined) {
+      try {
+        console.log("fetching komoditas..");
+        komoditas = getKomoditas();
+        console.log("finished fetching komoditas!");
+      } catch (e) {
+        console.log(e);
+        setErrorMessage(e.message);
+        return;
       }
+      komoditas = komoditas.map((item) => {
+        return { ...item, is_checked: false, is_filtered: false, amount: 1 };
+      });
 
-      if (lsData.length > 0) {
-        tempData = lsData.map((item) => {
-          return { ...item, is_checked: false, is_filtered: false, amount: 1 };
-        });
-      }
+      const uniqueKomoditas = remapUniqueKomoditas(komoditas);
+      setData(komoditas);
+      setUniqueKomoditas(uniqueKomoditas);
+      setFilteredData(uniqueKomoditas);
+    } else {
+      console.log("local storage not available");
+      return;
     }
-
-    fetch("/api/komoditas/all")
-      .then((data) => data.json())
-      .then((dataJson) => {
-        // remap data
-
-        const dataFetch = dataJson.data.map((item) => {
-          return { ...item, is_checked: false, is_filtered: false, amount: 1 };
-        });
-
-        const uniqueKomoditas = [
-          ...new Set(dataJson.data.map((item) => item.id_komoditas)),
-        ].map((id_komoditas, id) => {
-          let tempData = dataFetch.filter((item) =>
-            item.id_komoditas.includes(id_komoditas)
-          );
-
-          return {
-            id,
-            id_komoditas,
-            is_checked: false,
-            is_filtered: false,
-            satuan_standar: tempData[0].satuan_standar,
-            selected_satuan: tempData[0].satuan_subsatuan,
-            konversi: tempData.map((item) => {
-              return {
-                satuan_standar: item.satuan_standar,
-                satuan_subsatuan: item.satuan_subsatuan,
-                faktor_pengali: item.faktor_pengali,
-              };
-            }),
-            amount: 1,
-          };
-        });
-        // kalau ada tempData, taruh di atas list
-        if (tempData) {
-          setData(() => [...tempData, ...dataFetch]);
-          setUniqueKomoditas([...tempData, ...uniqueKomoditas]);
-          setFilteredData(() => [...tempData, ...uniqueKomoditas]);
-        } else {
-          setData(dataFetch);
-          setUniqueKomoditas(uniqueKomoditas);
-          setFilteredData(uniqueKomoditas);
-        }
-      })
-      .catch((e) => console.log(e));
   }, []);
 
-  const komoditasClickHandler = (id) => {
+  const komoditasClickHandler = (id_komoditas) => {
     let updatedItem;
     let updatedData = uniqueKomoditas.map((item) => {
-      if (item.id == id) {
+      if (item.id_komoditas == id_komoditas) {
         updatedItem = { ...item, is_checked: !item.is_checked, amount: 1 };
         return updatedItem;
       }
       return item;
     });
+
     setUniqueKomoditas(updatedData);
     // taruh data yang diklik ke paling bawah
-    const tempSelectedData = [
-      ...updatedData.filter((item) => item.is_checked && item.id != id),
-    ];
-    if (updatedItem.is_checked) {
-      tempSelectedData.push(updatedItem);
-    }
+    const tempSelectedData = updatedData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setFilteredData((prev) =>
       prev.map((item) => {
-        if (item.id == id) {
+        if (item.id_komoditas == id_komoditas) {
           return updatedItem;
         }
         return item;
@@ -298,22 +249,36 @@ export default function Home() {
     // setFilteredData(tempData);
   };
 
-  const addDataHandler = (kategori, nama, biaya) => {
-    let tempData = addData(kategori, nama, biaya);
+  const addKomoditasHandler = (
+    kategori,
+    nama_komoditas,
+    satuan_subsatuan,
+    faktor_pengali,
+    satuan_standar
+  ) => {
+    let tempData = addKomoditas(
+      kategori,
+      nama_komoditas,
+      satuan_subsatuan,
+      faktor_pengali,
+      satuan_standar
+    );
     tempData = [tempData, ...data];
-    const tempSelectedData = tempData.filter((item) => item.is_checked);
-    setSelectedData(tempSelectedData);
+    const newUniqueKomoditas = remapUniqueKomoditas(tempData); //
+    setUniqueKomoditas(newUniqueKomoditas);
+    setSelectedData(newUniqueKomoditas.filter((item) => item.is_checked));
     setData(tempData);
-    setFilteredData(tempData);
+    setFilteredData(newUniqueKomoditas);
   };
 
-  const deleteDataHandler = (id) => {
-    deleteData(id);
-    let tempData = data.filter((item) => item._id != id);
-    const tempSelectedData = tempData.filter((item) => item.is_checked);
-    setSelectedData(tempSelectedData);
+  const deleteDataHandler = (id_komoditas) => {
+    deleteKomoditas(id_komoditas);
+    let tempData = data.filter((item) => item.id_komoditas != id_komoditas);
+    const newUniqueKomoditas = remapUniqueKomoditas(tempData); //
+    setUniqueKomoditas(newUniqueKomoditas);
+    setSelectedData(newUniqueKomoditas.filter((item) => item.is_checked));
+    setFilteredData(newUniqueKomoditas);
     setData(tempData);
-    setFilteredData(tempData);
   };
   const onModalClickHandler = () => {
     setIsOpen((prev) => !prev);
@@ -323,30 +288,7 @@ export default function Home() {
     const dataFetch = data.map((item) => {
       return { ...item, is_checked: false, is_filtered: false, amount: 1 };
     });
-    const uniqueKomoditas = [
-      ...new Set(data.map((item) => item.id_komoditas)),
-    ].map((id_komoditas, id) => {
-      let tempData = dataFetch.filter((item) =>
-        item.id_komoditas.includes(id_komoditas)
-      );
-
-      return {
-        id,
-        id_komoditas,
-        is_checked: false,
-        is_filtered: false,
-        satuan_standar: tempData[0].satuan_standar,
-        selected_satuan: tempData[0].satuan_subsatuan,
-        konversi: tempData.map((item) => {
-          return {
-            satuan_standar: item.satuan_standar,
-            satuan_subsatuan: item.satuan_subsatuan,
-            faktor_pengali: item.faktor_pengali,
-          };
-        }),
-        amount: 1,
-      };
-    });
+    const uniqueKomoditas = remapUniqueKomoditas(dataFetch);
     setData(dataFetch);
     setUniqueKomoditas(uniqueKomoditas);
     setFilteredData(uniqueKomoditas);
@@ -360,7 +302,7 @@ export default function Home() {
       </div>
     );
   } else {
-    komoditiComp = (
+    komoditasComp = (
       <>
         {filteredData.length > 0 ? (
           <ListItem
@@ -385,19 +327,29 @@ export default function Home() {
       setFilteredData(tempData);
     }
   };
-
   return (
     <>
+      {errorMessage && (
+        <div
+          className="bg-red-100 rounded-lg text-red-600 font-medium p-2 m-2 text-sm"
+          onClick={() => setErrorMessage(null)}
+        >
+          {errorMessage}
+        </div>
+      )}
       <HomeCard title="Konversi Satuan Komoditas">
         <div className="space-y-2">
           {isOpen && (
             <div className="">
               <FormModal callback={onModalClickHandler}>
-                <ModalCreateKomoditiCard
+                <ModalCreateKomoditasCard
                   item={data[0]}
                   callback={onModalClickHandler}
-                  addDataCallback={addDataHandler}
+                  addDataCallback={addKomoditasHandler}
                   listKategori={[...new Set(data.map((item) => item.kategori))]}
+                  listNama={[
+                    ...new Set(data.map((item) => item.nama_komoditas)),
+                  ]}
                 />
               </FormModal>
             </div>
@@ -406,7 +358,7 @@ export default function Home() {
             callback={searchChangeHandler}
             placeholder="Cari komoditas"
           />
-          {komoditiComp}
+          {komoditasComp}
           <div className="flex m-auto w-full justify-between items-center p-2">
             {selectedData.length > 0 ? (
               <div

@@ -87,61 +87,122 @@ export const Modal = ({ item, callback, updateDataCallback }) => {
   );
 };
 
-export const ModalCreateKomoditi = ({
+export const ModalCreateKomoditas = ({
   callback,
   addDataCallback,
   listKategori,
+  listNama,
 }) => {
   const [kategori, setKategori] = useState("");
-  const [biaya, setBiaya] = useState("");
   const [nama, setNama] = useState("");
+  const [satuanSubsatuan, setSatuanSubsatuan] = useState("");
+  const [faktorPengali, setFaktorPengali] = useState(0);
+  const [satuanStandar, setSatuanStandar] = useState("");
+  const [errorMessage, setErrorMessage] = useState(null);
 
-  const isInputValid = (biaya) => {
-    const alphabets = /[a-zA-Z]/g;
-    return !alphabets.test(biaya);
+  const isInputValid = () => {
+    return (
+      kategori !== "" &&
+      nama !== "" &&
+      satuanSubsatuan !== "" &&
+      faktorPengali !== 0 &&
+      !isNaN(parseFloat(faktorPengali)) &&
+      satuanStandar !== ""
+    );
   };
-
   const onAddClickHandler = () => {
-    if (isInputValid(biaya)) {
-      addDataCallback(kategori, nama, parseInt(biaya));
+    if (isInputValid()) {
+      addDataCallback(
+        kategori,
+        nama,
+        satuanSubsatuan,
+        parseFloat(faktorPengali),
+        satuanStandar
+      );
       callback();
     } else {
-      setBiaya("");
+      console.log(
+        kategori,
+        nama,
+        satuanSubsatuan,
+        satuanStandar,
+        faktorPengali
+      );
+      setSatuanSubsatuan("");
+      setFaktorPengali(0);
+      setSatuanStandar("");
+      setErrorMessage("input tidak sesuai");
     }
   };
 
   return (
     <div className="absolute text-xl text-black inset-0 m-auto items-center w-fit h-fit bg-white z-20 rounded-xl p-4 space-y-4 pb-8 shadow-lg">
       <h1 className="text-lg text-center font-medium text-gray-600">
-        Tambah Kategori Pengeluaran
+        Tambah Komoditas
       </h1>
       <hr />
+      {errorMessage && (
+        <div
+          className="bg-red-100 rounded-md text-red-600 font-medium p-2 text-sm"
+          onClick={() => setErrorMessage(null)}
+        >
+          {errorMessage}
+        </div>
+      )}
       <div className="flex flex-col m-auto items-center justify-center space-y-6 h-full text-base">
         <ul className="flex flex-col items-center space-y-4">
-          <li key="amount">
+          <AutoCompleteInput
+            data={listKategori}
+            title="Kategori"
+            callback={setKategori}
+          />
+
+          <li key="nama" className="flex space-x-4 w-full justify-between">
             <AutoCompleteInput
-              data={listKategori}
-              title="kategori"
-              callback={setKategori}
+              data={listNama}
+              title="Nama Komoditas"
+              callback={setNama}
             />
           </li>
-          <li key="nama" className="flex space-x-4 w-full justify-between">
-            <span className="font-medium text-gray-600 flex-1">nama</span>
+          <li
+            key="satuan_subsatuan"
+            className="flex space-x-4 w-full justify-between"
+          >
+            <span className="font-medium text-gray-600 flex-1">Satuan</span>
             <input
               type="text"
-              value={nama}
-              onChange={(e) => setNama(e.target.value)}
-              className="block  px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+              value={satuanSubsatuan}
+              onChange={(e) => setSatuanSubsatuan(e.target.value)}
+              className="block px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
             />
           </li>
-
-          <li key="biaya" className="flex space-x-4 w-full justify-between">
-            <span className="font-medium text-gray-600 flex-1">biaya</span>
+          <li
+            key="faktor_pengali"
+            className="flex space-x-4 w-full justify-between"
+          >
+            <span className="font-medium text-gray-600 flex-1">
+              Faktor Pengali
+            </span>
             <input
               type="text"
-              value={biaya}
-              onChange={(e) => setBiaya(e.target.value)}
+              value={faktorPengali}
+              onChange={(e) => setFaktorPengali(e.target.value)}
+              className="block px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
+      focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
+            />
+          </li>
+          <li
+            key="satuan_standar"
+            className="flex space-x-4 w-full justify-between"
+          >
+            <span className="font-medium text-gray-600 flex-1">
+              Satuan Standar
+            </span>
+            <input
+              type="text"
+              value={satuanStandar}
+              onChange={(e) => setSatuanStandar(e.target.value)}
               className="block px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-36"
             />
@@ -166,7 +227,7 @@ export const ModalCreateKomoditi = ({
   );
 };
 
-export const ModalUpdatelKomoditi = ({
+export const ModalUpdatelKomoditas = ({
   item,
   callback,
   updateDataCallback,
@@ -233,7 +294,7 @@ export const ModalUpdatelKomoditi = ({
               (k) => k.satuan_subsatuan == selected_satuan
             )[0].faktor_pengali
           }{" "}
-          {item.satuan_standar}
+          {item.selected_satuan_standar}
         </div>
         <div className=" flex space-x-4 items-center w-full">
           <div
@@ -336,10 +397,10 @@ export const AutoCompleteInput = ({ data, callback, title }) => {
 
   const onChangeHandler = (e) => {
     setSelectedData(e.target.value);
-    const filterInput = e.target.value.toLowerCase();
-    if (filterInput.length < 1) {
+    if (e.target.value.length < 1) {
       setFilteredData(data);
     } else {
+      const filterInput = e.target.value.toLowerCase();
       const tempData = data.filter((item) =>
         item.toLowerCase().includes(filterInput)
       );
