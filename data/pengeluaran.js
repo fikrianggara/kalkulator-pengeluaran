@@ -1,4 +1,4 @@
-import { uuid } from "uuidv4";
+import { v4 as uuid } from "uuidv4";
 export const data = [
   {
     _id: 1,

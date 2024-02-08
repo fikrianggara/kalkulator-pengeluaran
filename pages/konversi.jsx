@@ -124,23 +124,25 @@ export const ListSelectedItem = ({
                   {item.id_komoditas.split("_")[1]}
                 </div>
                 <div
-                  className="self-start flex"
+                  className="self-start flex space-x-2"
                   onClick={() => {
                     setIsOpen((prev) => !prev);
                     setModalItem(item);
                   }}
                 >
-                  <span>
+                  <div>
                     {Math.round(item.amount * 100) / 100} {item.selected_satuan}
-                  </span>
-                  <span>=</span>
-                  <span className="font-bold">
+                  </div>
+                  <div>{" = "}</div>
+                  <div className="font-bold">
                     {item.amount *
                       item.konversi.filter(
                         (k) => k.satuan_subsatuan == item.selected_satuan
                       )[0].faktor_pengali}
-                  </span>{" "}
-                  <span className="font-bold">{item.satuan_standar}</span>
+                  </div>{" "}
+                  <div className="font-bold">
+                    {item.selected_satuan_standar}
+                  </div>
                 </div>
               </div>
             </div>
@@ -246,7 +248,7 @@ export default function Home() {
     const tempSelectedData = tempData.filter((item) => item.is_checked);
     setSelectedData(tempSelectedData);
     setUniqueKomoditas(tempData);
-    // setFilteredData(tempData);
+    setFilteredData(tempData);
   };
 
   const addKomoditasHandler = (
@@ -271,7 +273,7 @@ export default function Home() {
     setFilteredData(newUniqueKomoditas);
   };
 
-  const deleteDataHandler = (id_komoditas) => {
+  const deleteKomoditasHandler = (id_komoditas) => {
     deleteKomoditas(id_komoditas);
     let tempData = data.filter((item) => item.id_komoditas != id_komoditas);
     const newUniqueKomoditas = remapUniqueKomoditas(tempData); //
@@ -308,7 +310,7 @@ export default function Home() {
           <ListItem
             data={filteredData}
             callback={komoditasClickHandler}
-            deleteDataCallback={deleteDataHandler}
+            deleteDataCallback={deleteKomoditasHandler}
           />
         ) : (
           <div className="m-auto text-center text-gray-400">Tidak ada data</div>

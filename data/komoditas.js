@@ -136,11 +136,11 @@ export const remapUniqueKomoditas = (komoditas) => {
       return {
         id,
         id_komoditas,
-        is_checked: tempData[0].is_checked,
-        is_filtered: tempData[0].is_filtered,
+        is_checked: tempData.some((k) => k.is_checked),
+        is_filtered: tempData.some((k) => k.is_filtered),
         selected_satuan_standar: tempData[0].satuan_standar,
         selected_satuan: tempData[0].satuan_subsatuan,
-        is_created_by_user: tempData[0].is_created_by_user,
+        is_created_by_user: tempData.some((k) => k.is_created_by_user),
         konversi: tempData.map((item) => {
           return {
             satuan_standar: item.satuan_standar,

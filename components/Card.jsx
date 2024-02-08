@@ -103,10 +103,13 @@ export const ModalCreateKomoditas = ({
   const isInputValid = () => {
     return (
       kategori !== "" &&
+      kategori.length > 1 &&
       nama !== "" &&
+      nama.length > 1 &&
       satuanSubsatuan !== "" &&
       faktorPengali !== 0 &&
       !isNaN(parseFloat(faktorPengali)) &&
+      faktorPengali > 0 &&
       satuanStandar !== ""
     );
   };
@@ -234,13 +237,18 @@ export const ModalUpdatelKomoditas = ({
 }) => {
   const [amount, setAmount] = useState(item.amount);
   const [selected_satuan, setSelectedSatuan] = useState(item.selected_satuan);
+  const [selected_satuan_standar, setSelectedSatuanStandar] = useState(
+    item.selected_satuan_standar
+  );
   const onUpdateClickHandler = () => {
+    console.log("uweuhreuw");
     const itemUpdate = {
       ...item,
       amount: parseInt(amount),
       selected_satuan: selected_satuan,
+      selected_satuan_standar: selected_satuan_standar,
     };
-    // console.log(itemUpdate);
+    console.log(itemUpdate);
     updateDataCallback(itemUpdate);
     callback();
   };
@@ -274,7 +282,14 @@ export const ModalUpdatelKomoditas = ({
               defaultValue={item.selected_satuan}
               className="block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm placeholder-slate-400
       focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 flex-1"
-              onChange={(e) => setSelectedSatuan(e.target.value)}
+              onChange={(e) => {
+                setSelectedSatuan(e.target.value);
+                setSelectedSatuanStandar(
+                  item.konversi.filter(
+                    (k) => k.satuan_subsatuan == e.target.value
+                  )[0].satuan_standar
+                );
+              }}
             >
               {item.konversi.map((item) => (
                 <option
@@ -294,7 +309,7 @@ export const ModalUpdatelKomoditas = ({
               (k) => k.satuan_subsatuan == selected_satuan
             )[0].faktor_pengali
           }{" "}
-          {item.selected_satuan_standar}
+          {selected_satuan_standar}
         </div>
         <div className=" flex space-x-4 items-center w-full">
           <div
