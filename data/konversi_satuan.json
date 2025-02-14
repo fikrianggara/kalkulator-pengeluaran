@@ -1327,7 +1327,7 @@
     "kategori": "BUMBU-BUMBUAN",
     "nama_komoditas": "Sambal jadi",
     "satuan_subsatuan": "SACHET",
-    "faktor_pengali": 201.0,
+    "faktor_pengali": 200.0,
     "satuan_standar": "Ml",
     "id_komoditas": "BUMBU-BUMBUAN_Sambal jadi"
   },
@@ -1507,7 +1507,7 @@
     "kategori": "MAKANAN DAN MINUMAN JADI",
     "nama_komoditas": "Air teh kemasan, minuman bersoda/ mengandung CO2",
     "satuan_subsatuan": "GELAS",
-    "faktor_pengali": 220.0,
+    "faktor_pengali": 80.0,
     "satuan_standar": "ml",
     "id_komoditas": "MAKANAN DAN MINUMAN JADI_Air teh kemasan, minuman bersoda/ mengandung CO2"
   },
@@ -1516,7 +1516,7 @@
     "kategori": "MAKANAN DAN MINUMAN JADI",
     "nama_komoditas": "Air teh kemasan, minuman bersoda/ mengandung CO2",
     "satuan_subsatuan": "BOTOL",
-    "faktor_pengali": 250.0,
+    "faktor_pengali": 200.0,
     "satuan_standar": "ml",
     "id_komoditas": "MAKANAN DAN MINUMAN JADI_Air teh kemasan, minuman bersoda/ mengandung CO2"
   },
@@ -1525,7 +1525,7 @@
     "kategori": "MAKANAN DAN MINUMAN JADI",
     "nama_komoditas": "Air teh kemasan, minuman bersoda/ mengandung CO2",
     "satuan_subsatuan": "KOTAK",
-    "faktor_pengali": 200.0,
+    "faktor_pengali": 250.0,
     "satuan_standar": "ml",
     "id_komoditas": "MAKANAN DAN MINUMAN JADI_Air teh kemasan, minuman bersoda/ mengandung CO2"
   },
@@ -1534,7 +1534,7 @@
     "kategori": "MAKANAN DAN MINUMAN JADI",
     "nama_komoditas": "Sari buah kemasan, minuman kesehatan, minuman berenergi",
     "satuan_subsatuan": "GELAS",
-    "faktor_pengali": 220.0,
+    "faktor_pengali": 80.0,
     "satuan_standar": "ml",
     "id_komoditas": "MAKANAN DAN MINUMAN JADI_Sari buah kemasan, minuman kesehatan, minuman berenergi"
   },
@@ -1543,7 +1543,7 @@
     "kategori": "MAKANAN DAN MINUMAN JADI",
     "nama_komoditas": "Sari buah kemasan, minuman kesehatan, minuman berenergi",
     "satuan_subsatuan": "BOTOL",
-    "faktor_pengali": 250.0,
+    "faktor_pengali": 132.0,
     "satuan_standar": "ml",
     "id_komoditas": "MAKANAN DAN MINUMAN JADI_Sari buah kemasan, minuman kesehatan, minuman berenergi"
   },
